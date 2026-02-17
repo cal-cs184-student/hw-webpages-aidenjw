@@ -80,7 +80,44 @@
 		</div>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+		Supersampling is useful because it gives a better estimate of a pixel's true color by sampling
+		multiple locations inside the pixel and averaging them. This matters most for high-frequency content, 
+		especially triangle edges. On these edges, with only one sample per pixel, many pixels on the boundary of the edge 
+		flip between being inside and outside the triangle, causing aliasing. With more samples per pixel (supersampling), 
+		the boundary pixels become partially covered, so their averaged color becomes a smoother blend, making the edges
+		appear smoother.
+		</p>
+		<p>
+		To implement supersampling, I rasterized primitives into a higher-resolution sample buffer rather than
+		writing directly to the framebuffer. This sample buffer is treated as a virtual framebuffer of size width * n by height * n.
+		In rasterize_triangle, I evaluated coverage at each subsample location, and if the subsample lies inside the triangle, I wrote
+		the color to the corresponding position in sample_buffer. For points and lines, I modified fill_pixel() to fill all subsamples
+		of a pixel with the same color so that they rendered correctly without implementing antialiasing. After rasterization,
+		resolve_to_framebuffer() averaged the n x n subsamples for each pixel and wrote the averaged color to the actual framebuffer.
+		This allows edges of triangles to be blurred, visualizing the partial coverage of boundary pixels and acting as an antialiasing filter.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task2_images/1.png" width="400px"/>
+				  <figcaption>Sampling Rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task2_images/4.png" width="400px"/>
+				  <figcaption>Sampling Rate 4</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task2_images/16.png" width="400px"/>
+				  <figcaption>Sampling Rate 16</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h2>Task 3: Transforms</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
