@@ -457,7 +457,196 @@
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<h3>Overview: What is pixel sampling?</h3>
+		<p>
+		In texture mapping, each fragment (pixel sample) on the screen corresponds to a continuous texture coordinate
+		<span class="math">\( (u, v) \)</span> in the range <span class="math">\([0,1]\times[0,1]\)</span>.
+		The texture image, however, is stored as a discrete grid of texels. Pixel sampling is the process of
+		converting a continuous <span class="math">\( (u, v) \)</span> coordinate into a color by reading one or more nearby texels.
+		The choice of sampling method determines how sharp or smooth the final textured result appears, especially when the
+		texture is magnified or minified.
+		</p>
+
+		<h3>How I implemented pixel sampling</h3>
+		<p>
+		In my implementation, <code>Texture::sample</code> selects a pixel sampling method based on <code>sp.psm</code>.
+		For this task I used mip level 0 (base level) and focused on pixel sampling behavior:
+		</p>
+
+		<pre><code>Color Texture::sample(const SampleParams&amp; sp) {
+		int level = 0;
+		if (sp.psm == P_NEAREST) {
+			return sample_nearest(sp.p_uv, level);
+		} else { // P_LINEAR
+			return sample_bilinear(sp.p_uv, level);
+		}
+		}</code></pre>
+
+		<p>
+		Both sampling routines clamp <span class="math">\(u\)</span> and <span class="math">\(v\)</span> to
+		<span class="math">\([0,1]\)</span> to avoid out-of-bounds accesses, convert the continuous coordinates into texel-space
+		coordinates, and then read texel values from the selected mip level.
+		</p>
+
+		<h3>Nearest Neighbor Sampling</h3>
+		<p>
+		Nearest neighbor sampling chooses the single texel whose center is closest to the continuous
+		coordinate <span class="math">\( (u, v) \)</span>. Conceptually, it rounds to the nearest integer texel index and
+		returns that texel’s color.
+		</p>
+
+		<p>
+		Implementation details:
+		</p>
+		<ul>
+		<li>Clamp <span class="math">\(u,v\)</span> into <span class="math">\([0,1]\)</span>.</li>
+		<li>Map to texel coordinates:
+			<span class="math">\(x = u\cdot(\text{width}-1)\)</span>,
+			<span class="math">\(y = v\cdot(\text{height}-1)\)</span>.
+		</li>
+		<li>Round <span class="math">\(x,y\)</span> to the nearest integer texel indices.</li>
+		<li>Clamp indices to valid ranges and fetch the texel.</li>
+		</ul>
+
+		<pre><code>int tx = (int)round(u * (mip.width  - 1));
+		int ty = (int)round(v * (mip.height - 1));
+		return mip.get_texel(tx, ty);</code></pre>
+
+		<p>
+		Nearest sampling is very fast and preserves hard edges, but it often produces visible “blocky” artifacts when a
+		texture is magnified, since each pixel can abruptly switch between texels.
+		</p>
+
+		<h3>Bilinear Sampling</h3>
+		<p>
+		Bilinear sampling smooths these transitions by interpolating between the four texels surrounding
+		the continuous coordinate. Instead of picking one closest texel, it computes a weighted average based on how close
+		<span class="math">\( (u, v) \)</span> is to each texel corner in texel space.
+		</p>
+
+		<p>
+		Implementation details:
+		</p>
+		<ul>
+		<li>Clamp <span class="math">\(u,v\)</span> into <span class="math">\([0,1]\)</span>.</li>
+		<li>Compute continuous texel-space position:
+			<span class="math">\(x = u\cdot(\text{width}-1)\)</span>,
+			<span class="math">\(y = v\cdot(\text{height}-1)\)</span>.
+		</li>
+		<li>Compute the surrounding integer texel indices:
+			<span class="math">\(x_0=\lfloor x\rfloor\)</span>,
+			<span class="math">\(x_1=\min(x_0+1,\text{width}-1)\)</span>,
+			and similarly for <span class="math">\(y_0,y_1\)</span>.
+		</li>
+		<li>Compute interpolation weights:
+			<span class="math">\(s_x = x-x_0\)</span>,
+			<span class="math">\(s_y = y-y_0\)</span>.
+		</li>
+		<li>Fetch <span class="math">\(c_{00},c_{10},c_{01},c_{11}\)</span> and interpolate first in x, then in y.</li>
+		</ul>
+
+		<pre><code>Color c0 = c00 * (1.0f - sx) + c10 * sx;
+		Color c1 = c01 * (1.0f - sx) + c11 * sx;
+		return c0 * (1.0f - sy) + c1 * sy;</code></pre>
+
+		<h3>Pixel Sampling Comparison (Nearest vs. Bilinear)</h3>
+
+		<h4>Chosen Example Region</h4>
+		<p>
+		To find a clear case where bilinear sampling outperforms nearest sampling, I used the pixel inspector on
+		<code>svg/texmap/test4.svg</code> and zoomed into the parrot texture. I specifically focused on the parrot’s
+		black eye stripes, since they contain thin, high-contrast details (dark lines adjacent to bright colors)
+		that are very sensitive to how texture lookups are filtered during magnification.
+		</p>
+
+		<h4>Screenshots</h4>
+		<p>
+		Below are four screenshots of the <em>same zoomed-in region</em> (parrot eye stripes) under different settings:
+		</p>
+
+		<ul>
+		<li>Nearest sampling, 1 sample per pixel (1 spp)</li>
+		<li>Nearest sampling, 16 samples per pixel (16 spp)</li>
+		<li>Bilinear sampling, 1 sample per pixel (1 spp)</li>
+		<li>Bilinear sampling, 16 samples per pixel (16 spp)</li>
+		</ul>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 1100px;">
+		<figure style="margin: 0;">
+			<img src="task5_images/nearest_1.png" alt="Nearest sampling at 1 sample per pixel" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Nearest, 1 spp</strong></figcaption>
+		</figure>
+
+		<figure style="margin: 0;">
+			<img src="task5_images/nearest_16.png" alt="Nearest sampling at 16 samples per pixel" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Nearest, 16 spp</strong></figcaption>
+		</figure>
+
+		<figure style="margin: 0;">
+			<img src="task5_images/bilinear_1.png" alt="Bilinear sampling at 1 sample per pixel" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Bilinear, 1 spp</strong></figcaption>
+		</figure>
+
+		<figure style="margin: 0;">
+			<img src="task5_images/bilinear_16.png" alt="Bilinear sampling at 16 samples per pixel" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Bilinear, 16 spp</strong></figcaption>
+		</figure>
+		</div>
+
+		<h4>Relative Differences</h4>
+		<ul>
+		<li>
+			Nearest sampling produces a visibly blocky/pixelated appearance in the stripes.
+			Because nearest sampling chooses a single closest texel per lookup, small changes in screen position can cause
+			sudden jumps between texels. This creates harsh stair-step transitions and makes thin stripes look chunky.
+		</li>
+		<li>
+			Bilinear sampling makes the stripes look smoother and more continuous.
+			Since bilinear sampling interpolates between the four surrounding texels, the transition between dark stripe texels
+			and nearby lighter texels is blended rather than abruptly switching. This reduces visible texel boundaries and
+			preserves the perceived shape of the thin stripe details during magnification.
+		</li>
+		</ul>
+
+		<p>
+		Changing the supersample rate (1 spp to 16 spp) affects a different kind of aliasing:
+		</p>
+		<ul>
+		<li>
+			Increasing to 16 spp primarily improves edge aliasing (i.e., jagged boundaries of polygons/triangles),
+			because it averages multiple subpixel samples per pixel.
+		</li>
+		<li>
+			However, supersampling does not eliminate the blockiness of nearest texture filtering. In the nearest
+			16 spp screenshot, the triangle edges may look smoother than nearest 1 spp, but the parrot’s stripe texture still
+			shows discontinuous texel steps because each lookup still snaps to a single texel.
+		</li>
+		<li>
+			The best result is bilinear at 16 spp, which combines smoother texture interpolation (bilinear) with reduced
+			geometric aliasing (supersampling). This makes both the stripe details and nearby edges appear cleaner.
+		</li>
+		</ul>
+
+		<h4>When the difference is large (and why)</h4>
+		<p>
+		The difference between nearest and bilinear sampling is largest when the texture contains
+		high-frequency detail (thin lines, sharp contrast boundaries, small patterns) and the texture is being
+		magnified on screen. In these cases, a single pixel may map to a texture coordinate that lies between
+		multiple texels, and nearest sampling will group to one texel, creating blocky images.
+		</p>
+
+		<p>
+		Bilinear sampling reduces this because it approximates the underlying continuous image by blending between
+		neighboring texels. This produces smoother intensity transitions and prevents abrupt changes in appearance as the
+		sampling location moves slightly across the texture.
+		</p>
+
+		<p>
+		In contrast, if the texture is very smooth/low-frequency (gradients, large uniform regions), or if the texture is
+		close to 1:1 mapping with screen pixels, the difference between nearest and bilinear will be much smaller because
+		adjacent texels are already similar and snapping between them is less noticeable.
+		</p>
 
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
