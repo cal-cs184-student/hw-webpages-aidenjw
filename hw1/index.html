@@ -343,9 +343,9 @@
 			  </tr>
 			</table>
 		</div>
-
+		<h3>Extra Credit: Using Jittering to antialias</h3>
 		<p>
-			Extra credit: I also implemented a jittered antialiasing pattern. To do this, instead of adding 0.5 to the x and y coordinates
+			I also implemented a jittered antialiasing pattern. To do this, instead of adding 0.5 to the x and y coordinates
 			to make the code always sample from the center of the pixel, I generated a random offset between 0 and 1 for each subsample
 			and added them to the x and y coordinates to randomize the offsets. This introduces randomness to triangle edges, making it
 			appear noisy and sort of fuzzy. This is because the random offsets cause the coverage of boundary pixels to vary, removing
@@ -753,6 +753,40 @@
 		<figure style="margin: 0;">
 			<img src="task6_images/Llinear_Plinear.png" alt="Level Linear, Pixel Linear" style="width: 100%; height: auto; border: 1px solid #ccc;">
 			<figcaption><strong>L_LINEAR, P_LINEAR</strong></figcaption>
+		</figure>
+		</div>
+
+		<h3>Extra Credit: Summed-area Table implementation</h3>
+		<p>
+			I also implemented a summed-area table as an extra texture filter. For each mip level, I precomputed
+			an integral image per color channel to compute the average color over any texel rectangle in 4 SAT lookups.
+			During rasterization, I used the UV differentials to estiamte the pixel's texture footprint and approximated it
+			with an axis-aligned box, using the SAT box-filtered average for that region to compute the final color.
+			There is much less aliasing due to minifcation when compared to nearest pixel sampling and appears to have a better
+			antialiasing affect than bilinear sampling. However, the SAT implementation is significantly more expensive to compute
+			due to the precomputation and 4 pixel lookups per sample. It also results in a much more blurred image, as the overall
+			image appears very blurry when compared to other methods.
+		</p>
+		<p>
+			The images for bilinear pixel sampling, nearest pixel sampling, and summed-area table sampling are shown below.
+			All three images use level linear sampling to keep mip levels constant.
+		</p>
+
+		<h3>Pixel Sampling Comparison Images</h3>
+		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; max-width: 1100px;">
+		<figure style="margin: 0;">
+			<img src="task6_images/nearest.png" alt="Nearest pixel sampling" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Nearest</strong></figcaption>
+		</figure>
+
+		<figure style="margin: 0;">
+			<img src="task6_images/bilinear.png" alt="Bilinear pixel sampling" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>Bilinear</strong></figcaption>
+		</figure>
+
+		<figure style="margin: 0;">
+			<img src="task6_images/sat.png" alt="Summed-area table" style="width: 100%; height: auto; border: 1px solid #ccc;">
+			<figcaption><strong>SAT</strong></figcaption>
 		</figure>
 		</div>
 
