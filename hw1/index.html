@@ -740,6 +740,85 @@
 			<figcaption><strong>L_LINEAR, P_LINEAR</strong></figcaption>
 		</figure>
 		</div>
-		</div>
+
+		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
+
+		<h3>What I Made</h3>
+		<p>
+		For the art competition, I created a procedural spirograph made from many thin, overlapping
+		triangles. Instead of drawing curves (unsupported by the HW1 rasterizer), I approximated a smooth radial pattern by
+		placing 1400 skinny triangles around the center of an 800×800 canvas. The
+		dense overlap of triangles produces a smooth, high-detail design that looks like a spirograph.
+		</p>
+
+		<h3>How the Script Works</h3>
+
+		<h4>1) Build a skinny triangle in local coordinates</h4>
+		<p>
+		The script defines each triangle in a simple local coordinate frame where the triangle points in the +x direction.
+		Each triangle uses one vertex near the center and two vertices farther out to form a thin wedge:
+		</p>
+		<ul>
+		<li><span class="math">\(A=(r_{inner}, 0)\)</span> near the center</li>
+		<li><span class="math">\(B=(r, -w)\)</span> and <span class="math">\(C=(r, +w)\)</span> forming the outer edge</li>
+		</ul>
+		<p>
+		Here, <span class="math">\(r\)</span> controls how far the skinny triangle reaches and <span class="math">\(w\)</span> controls its thickness.
+		</p>
+
+		<h4>2) Rotate and translate each triangle into place</h4>
+		<p>
+		To create the spirograph, I iterate over <span class="math">\(n\)</span> triangles and assign each one an angle
+		<span class="math">\(\theta = 2\pi\cdot \frac{i}{n}\)</span>. I rotate the local triangle by <span class="math">\(\theta\)</span>
+		and then translate it to the center of the canvas <span class="math">\((C_x, C_y)\)</span>.
+		This places triangles evenly around the center:
+		</p>
+		<pre><code># rotate into place, then translate to center
+		a = translate(*rotate(ax, ay, theta), CX, CY)
+		b = translate(*rotate(bx, by, theta), CX, CY)
+		c = translate(*rotate(cx, cy, theta), CX, CY)</code></pre>
+
+		<h4>3) Radius change to create a spirograph-like outline</h4>
+		<p>
+		If every triangle used the same radius, the result would look like a regular circle/starburst. To make the outline
+		more spirograph-like, I change the radius as a function of angle:
+		</p>
+		<p class="math">
+		\[
+			r = r_{base} + r_{amp}\,\sin(7\theta)\cos(3\theta)
+		\]
+		</p>
+		<p>
+		This causes the triangle length to smoothly expand and contract around the circle, producing the characteristic lobes
+		and waves of a spirograph pattern.
+		</p>
+
+		<h4>4) Thickness variation and small jitter</h4>
+		<p>
+		To avoid an overly uniform look, I also vary the triangle width with angle and add a small random jitter to the outer
+		radius. This adds texture and depth while keeping the overall radial structure:
+		</p>
+		<ul>
+		<li><strong>Width variation:</strong> makes some triangles thicker/thinner depending on <span class="math">\(\theta\)</span></li>
+		<li><strong>Jitter:</strong> tiny random perturbation to prevent the pattern from looking too perfect</li>
+		</ul>
+
+		<h4>5) Color and opacity styling</h4>
+		<p>
+		I used a neon blue/purple scheme. The hue stays in a narrow range
+		near blue and shifts slightly with angle, while brightness and opacity vary with a sinusoid. This creates a subtle
+		glow effect where overlapping triangles build up intensity:
+		</p>
+		<ul>
+		<li><strong>Hue:</strong> centered near blue with small oscillation</li>
+		<li><strong>Value (brightness):</strong> varies with angle to add depth</li>
+		<li><strong>Opacity:</strong> varies so overlaps create layering</li>
+		</ul>
+
+		<h3>Rendering and Screenshot</h3>
+		Here is the final result!
+
+		<img src="competition.png" alt="competition.svg rendered output" style="max-width: 100%; height: auto; border: 1px solid #ccc;">
+		
 	</body>
 </html>
