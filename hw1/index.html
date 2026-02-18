@@ -344,6 +344,21 @@
 			</table>
 		</div>
 
+		<p>
+			Extra credit: I also implemented a jittered antialiasing pattern. To do this, instead of adding 0.5 to the x and y coordinates
+			to make the code always sample from the center of the pixel, I generated a random offset between 0 and 1 for each subsample
+			and added them to the x and y coordinates to randomize the offsets. This introduces randomness to triangle edges, making it
+			appear noisy and sort of fuzzy. This is because the random offsets cause the coverage of boundary pixels to vary, removing
+			the staircasing aliasing pattern and replacing it with a more natural noise. In the pixel inspector for the image below,
+			we can see the effects of the randomness, as some pixels which were mostly in the triangle completely disappear,
+			while pixels that were largely outside the triangle become colored.
+		</p>
+
+		<figure style="text-align: center;">
+			<img src="task2_images/ec_jittered.png" alt="Extra Credit Jittered" style="width:60%"/>
+			<figcaption>Extra Credit: Jittered antialiasing</figcaption>
+		</figure>
+
 		<h2>Task 3: Transforms</h2>
 		<p>
 		For this task, I posed Cubeman in a jumping jack position: arms raised out to the sides 
