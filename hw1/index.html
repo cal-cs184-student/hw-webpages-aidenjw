@@ -336,7 +336,122 @@
 		</div>
 
 		<h2>Task 3: Transforms</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+		For this task, I posed Cubeman in a jumping jack position: arms raised out to the sides 
+		and legs spread wide.
+		</p>
+
+		<p>
+		I also recolored Cubeman: a two-tone steel-blue torso, a gold diamond head with a cyan 
+		visor accent, teal arms, and crimson legs. Each body part uses a darker and lighter 
+		triangle for the same polygon shape.
+		</p>
+
+		<div align="middle">
+		<img src="task3_images/my_robot.png" align="middle" width="400px"/>
+		<figcaption align="middle">Cubeman mid-jumping-jack: arms raised outward, legs spread wide.</figcaption>
+		</div>
+
+		<p>
+		The key challenge was rotating each limb around its joint rather than its center. 
+		Since SVG rotations pivot around the current local origin, I first 
+		<code>translate()</code> to the joint position, then <code>rotate()</code>, then place 
+		the segment geometry offset from that pivot. For example, the hip joint sits at 
+		<code>y = 60</code> because the upper-leg segment is centered at <code>y = 90</code> 
+		with a half-height of 30 (derived from <code>scale(0.2, 0.6)</code> on a ±50 unit 
+		square), so the top of the segment (the hip) lands at <code>90 − 30 = 60</code>. 
+		The same logic horizontally gives the shoulder at <code>x = ±60</code> for the arms.
+		</p>
+
+		<p>
+		With the pivots correctly placed, the left leg rotates <code>+35°</code> and the right 
+		leg <code>−30°</code>, spreading the legs outward from the body's center line. The arms 
+		mirror this symmetry: the left arm rotates <code>+35°</code> and the right arm 
+		<code>−35°</code>, angling both upward and away from the torso. The result is a 
+		bilaterally symmetric pose that reads immediately as a jumping jack mid-motion.
+		</p>
+
+		<h3>Extra Credit: Viewport Rotation (GUI Feature)</h3>
+
+		<h4>Feature Overview</h4>
+		<p>
+		For the extra credit, I added a viewport rotation feature to the GUI. Using two previously unused
+		keys, the user can rotate the entire view of the SVG canvas in fixed increments.
+		</p>
+
+		<ul>
+		<li><strong>[</strong> rotates the viewport counterclockwise by 5 degrees</li>
+		<li><strong>]</strong> rotates the viewport clockwise by 5 degrees</li>
+		</ul>
+
+		<h4>Implementation Details</h4>
+
+		<h5>1) Adding new keybindings</h5>
+		<p>
+		I implemented the new controls in <code>DrawRend::keyboard_event</code>. On key press, I update a member variable
+		<code>viewport_deg</code> and trigger a redraw:
+		</p>
+		<pre><code>case '[':
+		viewport_deg += 5.0f;
+		redraw();
+		break;
+
+		case ']':
+		viewport_deg -= 5.0f;
+		redraw();
+		break;</code></pre>
+
+		<h5>2) Modifying the SVG → NDC → Screen transform</h5>
+		<p>
+		The core idea is that the renderer already uses a matrix stack to map SVG coordinates to screen coordinates:
+		</p>
+		<pre><code>screen_pos = ndc_to_screen * svg_to_ndc * svg_pos</code></pre>
+
+		<p>
+		I inserted an additional viewport rotation matrix between <code>ndc_to_screen</code> and
+		<code>svg_to_ndc</code>. This makes the rotation act in NDC space, meaning it rotates the entire
+		normalized view (the <span class="math">\([0,1]^2\)</span> canvas) rather than rotating individual SVG objects.
+		</p>
+
+		<p>
+		A direct rotation in NDC would rotate about the origin (0,0), which would swing the image out of view. To rotate
+		about the center of the viewport instead, I used the standard pivot trick:
+		</p>
+
+		<p class="math">
+		\[
+			M_{\text{viewport}} = T(0.5, 0.5)\; R(\theta)\; T(-0.5, -0.5)
+		\]
+		</p>
+
+		<p>
+		This translates the NDC center to the origin, rotates by <span class="math">\(\theta\)</span>, and then translates back.
+		In code, I constructed:
+		</p>
+
+		<pre><code>Matrix3x3 viewport_rot =
+		translate(0.5f, 0.5f) *
+		rotate(viewport_deg) *
+		translate(-0.5f, -0.5f);</code></pre>
+
+		<p>
+		Then I applied it in the draw call:
+		</p>
+
+		<pre><code>svg.draw(software_rasterizer, ndc_to_screen * viewport_rot * svg_to_ndc[current_svg]);</code></pre>
+
+		<h5>3) Rotating the canvas outline consistently</h5>
+		<p>
+		The canvas outline is drawn manually using line rasterization. To keep the outline aligned with the rotated viewport,
+		I applied the same matrix stack to the four SVG-space corners.
+		This ensures both the scene and the border are transformed identically, so the border continues to correctly frame the
+		SVG canvas even as the view rotates.
+		</p>
+
+		<h4>Results</h4>
+		<div align="middle">
+		<img src="task3_images/ec.png" align="middle" width="400px"/>
+		</div>
 
 		<h2>Task 4: Barycentric coordinates</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
