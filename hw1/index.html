@@ -454,7 +454,32 @@
 		</div>
 
 		<h2>Task 4: Barycentric coordinates</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			Barycentric coordinates are a way of expressing any point inside a triangle as a weighted combinationof the 
+			triangle's 3 vertices. Given a triangle with vertices 
+			<span class="math">\((v0, v1, v2)\)</span>, any point <span class="math">\(p\)</span> can be represented as:
+			p = w0 * v0 + w1 * v1 + w2 * v2
+			where <span class="math">\(w0, w1, w2\)</span> are the barycentric coordinates that sum to 1, and with all 
+			weights being non-negative for points inside the triangle. These 3 weights tell us how close the point is to
+			each of the vertices, allowing us to interpolate attributes such as color from the triangle vertices.
+
+			In this image, the area near the red vertex appears mostly red, and similarly for the other colors/vertices.
+			The center is a blend of red, green, and blue, as it is a mix of all 3 vertices. This is since the closer we 
+			are to a given vertex, the larger the weight corresponding to that vertex is in barycentric coordinates,
+			and thus the larger the contribution of that vertex's color to the final interpolated color at that point. The center 
+			of the triangle is an even blend of all 3 vertices as all 3 weights are equal, and points on any of the 3 vertices
+			are the pure color of that vertex, as its weight for that verex is 1 and all other weights 0.
+		</p>
+
+		<figure style="text-align: center;">
+			<img src="task4_images/writeup_aid.png" alt="Barycentric coordinates visualization" style="width:60%"/>
+			<figcaption>Barycentric coordinates interpolation, colors blend smoothly from each vertex.</figcaption>
+		</figure>
+
+		<figure style="text-align: center;">
+			<img src="task4_images/basic_test7.png" alt="basic_test7" style="width:100%"/>
+			<figcaption>Basic Test 7, sample rate = 1</figcaption>
+		</figure>
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
 
