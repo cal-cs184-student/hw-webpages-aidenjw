@@ -51,9 +51,127 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h3>Overview</h3>
+		<p>
+			In this task, I implemented basic triangle rasterization without supersampling. The goal was to determine
+			which pixels are covered by a given triangle and color those pixels appropriately.
+		</p>
+		<p>
+			My implementation follows a standard bounding-box and edge-function approach. For each triangle, I:
+		</p>
+		<ol>
+			<li>Compute its axis-aligned bounding box.</li>
+			<li>Iterate over all pixel centers inside that bounding box.</li>
+			<li>Use edge functions to determine whether each sample lies inside the triangle.</li>
+			<li>Fill the pixel if the sample is inside.</li>
+		</ol>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		<h3>Bounding Box Computation</h3>
+		<p>
+			Given triangle vertices <span class="math">\((x0, y0), (x1, y1), (x2, y2)\)</span>, I first compute the smallest
+			axis-aligned rectangle that fully contains the triangle:
+		</p>
+		<ul>
+			<li><span class="math">\(min_x = floor(min(x0, x1, x2))\)</span></li>
+			<li><span class="math">\(max_x = ceil(max(x0, x1, x2))\)</span></li>
+			<li><span class="math">\(min_y = floor(min(y0, y1, y2))\)</span></li>
+			<li><span class="math">\(max_y = ceil(max(y0, y1, y2))\)</span></li>
+		</ul>
+		<p>
+			I then clamp these bounds to the framebuffer dimensions
+			<span class="math">\([0, width-1]\)</span> and <span class="math">\([0, height-1]\)</span> to avoid out-of-bounds access.
+		</p>
+
+		<h3>Edge Function and Point-in-Triangle Test</h3>
+		<p>
+			To determine whether a sample lies inside the triangle, I use an edge function:
+		</p>
+		<pre><code>E(a, b, p) = (p - a) × (b - a)</code></pre>
+		<p>
+			This is the 2D cross product. The sign indicates which side of the directed edge
+			<span class="math">\(a → b\)</span> the point <span class="math">\(p\)</span> lies on:
+		</p>
+		<ul>
+			<li><span class="math">\(E &gt; 0\)</span>: point is on the left side</li>
+			<li><span class="math">\(E &lt; 0\)</span>: point is on the right side</li>
+			<li><span class="math">\(E = 0\)</span>: point lies on the edge</li>
+		</ul>
+
+		<p>
+			To handle both clockwise and counter-clockwise vertex orderings, I compute the signed double-area:
+		</p>
+		<pre><code>area2 = E(v0, v1, v2)</code></pre>
+		<ul>
+			<li><span class="math">\(area2 &gt; 0\)</span>: counter-clockwise</li>
+			<li><span class="math">\(area2 &lt; 0\)</span>: clockwise</li>
+			<li><span class="math">\(area2 = 0\)</span>: degenerate triangle (skip)</li>
+		</ul>
+
+		<p>
+			A point is inside the triangle if it lies consistently on the inner side of all three edges, depending
+			on the sign of <span class="math">\(area2\)</span>.
+		</p>
+
+		<h3>Rasterization Loop</h3>
+		<p>
+			For every integer pixel coordinate <span class="math">\((x, y)\)</span> inside the bounding box:
+		</p>
+		<ol>
+			<li>Sample at the pixel center <span class="math">\((x + 0.5, y + 0.5)\)</span>.</li>
+			<li>Evaluate the three edge functions.</li>
+			<li>If inside, call <code>fill_pixel(x, y, color)</code>.</li>
+		</ol>
+
+		<h3>Correctness and Complexity Analysis</h3>
+
+		<p>
+		<strong>Correctness.</strong>
+		The algorithm first computes the triangle’s axis-aligned bounding box, which is guaranteed to contain
+		the entire triangle. Therefore, any pixel whose center could be inside the triangle must lie within this box,
+		and it is sufficient to only test samples in this region.
+		</p>
+
+		<p>
+		For each pixel <span class="math">\( (x, y) \)</span> in the bounding box, the algorithm samples at the pixel center
+		<span class="math">\( (x + 0.5,\, y + 0.5) \)</span> and evaluates three edge functions—one per triangle edge.
+		Each edge function corresponds to a half-plane test: it returns a signed value indicating whether the sample lies
+		to the left or right of a directed edge. A point is inside the triangle if it lies on the “inside” side of
+		<em>all three</em> edges. To support both clockwise and counter-clockwise vertex orderings, the code checks the sign of the
+		triangle’s signed area and consistently uses either <span class="math">\( \ge 0 \)</span> or
+		<span class="math">\( \le 0 \)</span> for all three edges. This ensures that pixels are filled exactly when their centers lie
+		inside (or on the boundary of) the triangle.
+		</p>
+
+		<p>
+		Degenerate triangles (zero area) are handled explicitly by early return, preventing undefined behavior and ensuring
+		correctness in edge cases.
+		</p>
+
+		<p>
+		<strong>Complexity.</strong>
+		Let the bounding box have width <span class="math">\(W\)</span> and height <span class="math">\(H\)</span>.
+		The algorithm iterates over every integer pixel coordinate in this rectangle, performing a constant amount of work per pixel:
+		three edge-function evaluations (each consisting of a small fixed number of multiplies/adds) and a few comparisons.
+		Therefore, the total work per triangle is proportional to the number of pixels in the bounding box:
+		</p>
+
+		<p>
+		<span class="math">\( \Theta(W \cdot H) \)</span>
+		</p>
+
+		<p>
+		This is asymptotically no worse than any approach that “checks each sample within the bounding box,” since such approaches
+		must also visit <span class="math">\(W \cdot H\)</span> samples and do at least constant work per sample.
+		The only additional overhead here is the constant-time setup (bounding-box computation, clamping, and a single signed-area
+		computation), which does not change the overall runtime.
+		</p>
+
+		<figure>
+			<img src="task1_images/basic_test4.png" alt="basic_test4" style="width:100%"/>
+			<figcaption>Basic Test 4</figcaption>
+		</figure>
+
+		<!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
@@ -77,7 +195,105 @@
 				</td>
 			  </tr>
 			</table>
-		</div>
+		</div> -->
+		<h3>Optimizations Beyond Basic Bounding-Box Rasterization</h3>
+
+		<p>
+		In addition to the standard bounding box and per-pixel inside test approach, I implemented a
+		scanline rasterizer that reduces unnecessary work on pixels that are inside the
+		triangle’s bounding box but outside the triangle itself.
+		</p>
+
+		<h4>1) Scanline Span Filling (Primary Optimization)</h4>
+		<p>
+		A basic triangle rasterizer computes the triangle’s axis-aligned bounding box and then, for every pixel
+		center in that box, evaluates three edge functions to test whether the sample lies inside the triangle. This can
+		waste a significant amount of work when the triangle occupies only a small fraction of its bounding box (e.g.,
+		thin or diagonal triangles).
+		</p>
+		<p>
+		Instead, my implementation rasterizes the triangle one scanline at a time. For each integer screen row
+		<span class="math">\(y\)</span>, I sample at the pixel-center y-coordinate <span class="math">\(s_y = y + 0.5\)</span>
+		and compute the intersection between the horizontal line at <span class="math">\(s_y\)</span> and the triangle’s edges.
+		These intersections produce (up to) two x-coordinates, which define a single contiguous covered interval
+		<span class="math">\([x_L, x_R]\)</span> on that scanline. I then fill only the pixels whose centers lie within that span.
+		</p>
+
+		<h4>2) Half-Open Rule for Robust Edge/Vertex Handling</h4>
+		<p>
+		To avoid double-counting intersections at shared vertices (which can happen when a scanline passes exactly through
+		a vertex), I use a half-open y-interval rule for each edge: the scanline intersects an edge only when
+		<span class="math">\(s_y\)</span> lies in <span class="math">\([y_{\min}, y_{\max})\)</span>. Additionally, horizontal edges
+		are ignored during intersection. This combination ensures that each scanline typically yields exactly two valid
+		intersections and avoids cracks or double-filled rows at triangle boundaries.
+		</p>
+
+		<h3>Timing Comparison (Averaged Over 3 Trials)</h3>
+
+		<p>
+		To quantify the performance improvement, I measured the average time per triangle
+		(in nanoseconds) for both the baseline bounding-box rasterizer (per-pixel edge tests)
+		and the optimized scanline span-filling implementation.
+		</p>
+
+		<p>
+		Each configuration was run over 3 trials, and I report the
+		mean time per triangle along with the standard deviation to reflect
+		variability between runs.
+		</p>
+
+		<table style="border-collapse: collapse; width: 100%; max-width: 1000px;">
+		<thead>
+			<tr>
+			<th style="border: 1px solid #ccc; padding: 8px;">Task</th>
+			<th style="border: 1px solid #ccc; padding: 8px;">Triangles</th>
+			<th style="border: 1px solid #ccc; padding: 8px;">Baseline Mean (ns/triangle)</th>
+			<th style="border: 1px solid #ccc; padding: 8px;">Baseline Std Dev</th>
+			<th style="border: 1px solid #ccc; padding: 8px;">Optimized Mean (ns/triangle)</th>
+			<th style="border: 1px solid #ccc; padding: 8px;">Optimized Std Dev</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td style="border: 1px solid #ccc; padding: 8px;">3</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">1800</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">2106.75</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">90.96</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">491.16</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">98.49</td>
+			</tr>
+			<tr>
+			<td style="border: 1px solid #ccc; padding: 8px;">4</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">5</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">77655.67</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">6565.96</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">37947.27</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">409.48</td>
+			</tr>
+			<tr>
+			<td style="border: 1px solid #ccc; padding: 8px;">5</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">6</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">175592.67</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">17091.72</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">75865.70</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">3489.67</td>
+			</tr>
+			<tr>
+			<td style="border: 1px solid #ccc; padding: 8px;">6</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">120</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">5238.05</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">217.34</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">2031.47</td>
+			<td style="border: 1px solid #ccc; padding: 8px;">47.04</td>
+			</tr>
+		</tbody>
+		</table>
+
+		<p>
+		The results show a consistent performance improvement across all tasks. The relatively small
+		standard deviations indicate stable performance across trials. The scanline span-filling
+		method significantly reduces unnecessary per-pixel edge tests inside the bounding box.
+		</p>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		<p>
