@@ -93,7 +93,46 @@
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			I implemented this function by first inserting a new vertex at the selected edge's midpoint, then connecting
+			it to the 2 opposite vertices. I then updated teh mesh connectivity to split the 2 triangles adjacent to the 
+			edge into 4 smaller triangles. This allowed the operation to run in constant time as only 1 vertex is created along
+			with the necessary edges, faces, and halfedges.
+		</p>
+		<p>
+			For debugging, I used the GUI and alternated between edge flips and splits in the same region. Being able to see the 
+			address of each halfedge helped as it allowed me to verify that the connectivity was correct and that the original
+			edge would be split into 2 edges.
+			I also thought I had a bug where edges would disappear when I tried to flip them after splitting. It took me a while
+			to realize that this wasn't necessarily a bug as this only occured when 3 of the 4 vertices of the 2 triangles adjacent to
+			the edge were colinear, which would correctly overlay the flipped edge on top of an existing edge.
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task5_images/plain.png" width="200px"/>
+				  <figcaption>Plain cube with 1 edge</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5_images/1_split.png" width="200px"/>
+				  <figcaption>Cube after 1 split</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5_images/2_split.png" width="200px"/>
+				  <figcaption>Cube after 2 splits</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5_images/2_split_1_flip.png" width="200px"/>
+				  <figcaption>Cube after 2 splits and 4 flips (along the white edge in the previous image and other 3 edges)</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5_images/split_flip_split.png" width="200px"/>
+				  <figcaption>Cube after further splitting the flipped edge on the previous image</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
