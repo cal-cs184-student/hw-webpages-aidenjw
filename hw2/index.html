@@ -135,7 +135,59 @@
 		</div>
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			I used the 3 steps suggested in the prompt to implement the loop subdivision. I started by computing all
+			the updated positions from the original mesh by doing the following for every vertex: I applied the loop 
+			smoothing rule based on its degree and neighbors, and for each original edge I computed the midpoint vertex using 
+			3/8-1/8 weighting with the 2 opposite vertices. I then used 4-1 refinement by splitting every original edge once, 
+			marking which vertices and edges were newly created. I then flipped all new edges that connected an old vertex to 
+			a new vertex to restore the triangular pattern. I then copied the precomputed positions into the mesh vertices to update
+			the geometry.
+		</p>
+		<p>
+			For debugging I originally had my program crash/severly lag when trying to subdivide the cube. I realized that this
+			was because I didn't split only the original edges, creating an infinite loop. I fixed this by marking the newly created
+			edges. For the implementation, what helped me most was going through manually and trying to recreate the steps of the 
+			algorithm by hand using splits and flips on the teapot mesh. I used the step by step picture in the prompt to guide me 
+			through what the mesh should look like after each step, then manually created each step in the GUI, then translated that into
+			code.
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6_images/cube.png" width="200px"/>
+				  <figcaption>Cube mesh</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6_images/1_division.png" width="200px"/>
+				  <figcaption>After 1 division</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6_images/2_division.png" width="200px"/>
+				  <figcaption>After 2 divisions (doesn't preserve symmetry well)</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6_images/presplit.png" width="200px"/>
+				  <figcaption>Presplit mesh</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6_images/presplit_division.png" width="200px"/>
+				  <figcaption>Presplit after 1 division</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6_images/presplit_2_division.png" width="200px"/>
+				  <figcaption>Presplit after 2 divisions (preserves symmetry)</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
