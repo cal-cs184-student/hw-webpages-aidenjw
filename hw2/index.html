@@ -416,6 +416,18 @@
 			through what the mesh should look like after each step, then manually created each step in the GUI, then translated that into
 			code.
 		</p>
+		<p>
+			In the images below, we have 2 cubes, one default and one with presplits. The presplits were made
+			by splitting every original edge in the default cube once. The images then show both cubes
+			after 1 subdivision and 2 subdivisions. In the default cube, we lose the cube-like shape and its sharp edges/corners
+			almost entirely after the first subdivision. In the presplit cube, we can still clearly see a cube-like shape in the
+			first subdivision and can still see the edges/corners of the cube, although they are much more smoothed out.
+			The default cube becomes slightly more asymetrical after every further subdivision since each face is initially triangulated 
+			with a singular diagonal. This diagonal breaks the symmetry, as the 2 vertices on this diagonal are used in a different 
+			triangle pattern than the other 2 vertices in the square face. Since the loop subdivision uses weighted averages, the small 
+			connectivity differences build up and make the cube asymmetric. To help this, my presplits on every original edge introduced a 
+			symmetrical set of triangles within every face. This allowed the loop subdivision to apply the same transforms on every corner.
+		</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
