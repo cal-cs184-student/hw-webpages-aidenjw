@@ -38,10 +38,10 @@
 		
 		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
 
-		<figure>
+		<!-- <figure>
 			<img src="teapot.png" alt="Teapot" style="width:50%"/>
 			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		</figure> -->
 
 		<!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
@@ -53,44 +53,295 @@
 		<h2>Section I: Bezier Curves and Surfaces</h2>
 
 		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			de Casteljau’s algorithm evaluates a Bezier curve at a parameter <code>t</code> by
+			repeatedly linearly interpolating between neighboring control points. Starting with
+			the original control points, it computes a new set of points where each new point is
+			a weighted combination of two adjacent points:
+			<code>(1 - t) p_i + t p_{i+1}</code>. Repeating this process produces smaller and
+			smaller sets of intermediate points until only one point remains, and that final
+			point is the point on the Bezier curve at parameter <code>t</code>.
+		</p>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
+		<p>
+			In my implementation, I wrote the evaluation for one subdivision step. Given the
+			current vector of points, I create a new vector that stores the interpolated points
+			between each adjacent pair. Since each step combines neighboring points, the output
+			vector has one fewer point than the input vector. If there are fewer than two points,
+			there is nothing to interpolate, so the function returns an empty vector.
+		</p>
+
+		<p>
+			More specifically, I loop through the current control points from left to right and,
+			for each pair of consecutive points, compute their linear interpolation using the
+			class member <code>t</code>. Each interpolated point is pushed into a new vector,
+			which represents the next level of de Casteljau subdivision. By repeatedly applying
+			this same step to the newly generated points, the program eventually reaches a single
+			final point, which is the evaluated point on the Bezier curve.
+		</p>
+
+		<div class="grid">
+			<img src="task1_images/step1.png" alt="Step 1">
+			<img src="task1_images/step2.png" alt="Step 2">
+			<img src="task1_images/step3.png" alt="Step 3">
+			<img src="task1_images/step4.png" alt="Step 4">
+			<img src="task1_images/step5.png" alt="Step 5">
+			<img src="task1_images/step6.png" alt="Step 6">
+			<img src="task1_images/step7.png" alt="Step 7">
 		</div>
 
+		<style>
+		.grid{
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px;
+		}
+		.grid img{
+			width: 100%;
+			height: auto;
+			display: block;
+			border-radius: 8px;
+		}
+		</style>
+
+		<p>
+			I created a slightly different Bezier curve by dragging the original control
+			points to new positions. After changing the control point layout,
+			I adjusted the parameter <code>t</code> using mouse scrolling, which moved the
+			evaluated point to a different location along the curve and changed the
+			intermediate de Casteljau construction.
+		</p>
+
+		<figure>
+			<img src="task1_images/diff_curve.png" alt="diff_curve" style="width:100%"/>
+		</figure>
+
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			de Casteljau’s algorithm extends from Bezier curves to Bezier surfaces by
+			applying the same repeated linear interpolation process in two parametric
+			directions, usually <code>u</code> and <code>v</code>. Instead of a single list of
+			control points, a Bezier surface is defined by a 2D grid of control points.
+			To evaluate a point on the surface, we first evaluate along one direction of
+			the grid, then evaluate the resulting points along the other direction.
+		</p>
+
+		<p>
+			In my implementation, I first wrote <code>evaluateStep</code>, which performs one
+			level of de Casteljau interpolation on a vector of 3D points. Given a list of
+			points and a parameter <code>t</code>, it computes a new list where each point is
+			the linear interpolation of two adjacent input points. This reduces the number
+			of points by one at each step.
+		</p>
+
+		<p>
+			I then implemented <code>evaluate1D</code>, which fully evaluates de Casteljau’s
+			algorithm on a 1D list of control points by repeatedly calling
+			<code>evaluateStep</code> until only one point remains. That final point is the
+			Bezier curve value for the given parameter.
+		</p>
+
+		<p>
+			To evaluate the full Bezier patch at <code>(u, v)</code>, I apply this 1D evaluation
+			twice. First, for each row of the control point grid, I evaluate a Bezier
+			curve at parameter <code>u</code>. This produces one intermediate point per row.
+			These intermediate points form a new 1D list, and I then evaluate that list
+			at parameter <code>v</code>. The result is the final point on the Bezier surface.
+		</p>
+
+		<p>
+			So overall, my surface evaluation works by reducing the 2D Bezier patch into
+			a set of intermediate row points using <code>u</code>, and then reducing those
+			again using <code>v</code> to obtain the final 3D position on the surface.
+		</p>
+
+		<figure>
+			<img src="task2_images/teapot_2.png" alt="Teapot" style="width:100%"/>
+		</figure>
 
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			I implemented the area-weighted vertex normal by traversing all faces adjacent
+			to the vertex using the halfedge structure and summing their contributions to
+			the normal. Starting from the vertex’s halfedge, I moved around the one-ring
+			neighborhood with <code>twin()-&gt;next()</code> until I returned to the starting
+			halfedge.
+		</p>
+
+		<p>
+			For each neighboring triangle that was not a boundary face, I retrieved its
+			three vertex positions and computed the triangle’s area using half the
+			magnitude of the cross product of two edge vectors. I then multiplied the
+			face normal by this area and added the result to an accumulated normal vector.
+		</p>
+
+		<p>
+			This produces an area-weighted average, so larger triangles have a greater
+			influence on the final vertex normal than smaller triangles. After processing
+			all adjacent faces, I normalized the accumulated vector to obtain a unit
+			normal. If the accumulated normal had zero length, I returned the zero vector
+			instead.
+		</p>
+
+		<div class="two-images">
+		<figure>
+			<img src="task3_images/teapot_default.png" alt="teapot default">
+			<figcaption>Without Vertex Normals</figcaption>
+		</figure>
+
+		<figure>
+			<img src="task3_images/teapot_phong.png" alt="teapot phong">
+			<figcaption>With Vertex Normals</figcaption>
+		</figure>
+		</div>
+
+		<style>
+		.two-images {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		figure {
+			margin: 0;
+			text-align: center;
+		}
+
+		figure img {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+
+		figcaption {
+			margin-top: 6px;
+			font-size: 14px;
+			color: #555;
+		}
+		</style>
+
+		<style>
+		.two-images {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 12px;
+			align-items: start;
+		}
+
+		.two-images img {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+		</style>
 
 		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			I implemented the edge flip operation by updating the connectivity of the
+			halfedge data structure around the two triangles that share the edge. First,
+			I obtained the halfedge corresponding to the input edge and its twin. If the
+			edge or either adjacent face was on the boundary, I returned immediately
+			without modifying the mesh, since boundary edges should not be flipped.
+		</p>
+
+		<p>
+			For a valid edge, I collected the six halfedges surrounding the two triangles,
+			along with the four involved vertices and the two faces. Flipping the edge
+			effectively replaces the diagonal between the two triangles. Therefore, the
+			two halfedges representing the diagonal were reassigned to connect the
+			opposite pair of vertices, while the surrounding halfedges kept their
+			vertices but had their <code>next</code> and <code>face</code> relationships
+			updated to reflect the new triangle cycles.
+		</p>
+
+		<p>
+			After updating the connectivity of the halfedges, I also updated the
+			associated pointers stored in the faces, edges, and vertices so that each
+			element referenced a valid halfedge in the new configuration. This ensures
+			that the mesh structure remains consistent after the flip.
+		</p>
+
+		<p>
+			One useful debugging trick was to explicitly label and store all halfedges,
+			vertices, edges, and faces involved in the two triangles before modifying
+			anything. This made it easier to reason about the topology and verify that
+			each pointer was updated correctly. I also found it helpful to visually inspect 
+			the result after each change to ensure the triangles were connected correctly.
+		</p>
+
+				<div class="two-images">
+		<figure>
+			<img src="task3_images/teapot_default.png" alt="teapot default">
+			<figcaption>Before Edge Flips</figcaption>
+		</figure>
+
+		<figure>
+			<img src="task4_images/teapot_flip.png" alt="teapot phong">
+			<figcaption>After Edge Flips</figcaption>
+		</figure>
+		</div>
+
+		<style>
+		.two-images {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		figure {
+			margin: 0;
+			text-align: center;
+		}
+
+		figure img {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+
+		figcaption {
+			margin-top: 6px;
+			font-size: 14px;
+			color: #555;
+		}
+		</style>
+
+		<style>
+		.two-images {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 12px;
+			align-items: start;
+		}
+
+		.two-images img {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+		</style>
+
+		<p>
+			Debugging the edge flip operation required careful reasoning about the
+			halfedge connectivity. One of the main challenges was making sure that every
+			pointer in the local neighborhood was updated correctly. Early versions of my
+			implementation produced incorrect meshes where faces became twisted or edges
+			appeared disconnected. This usually meant that one of the <code>next</code>,
+			<code>twin</code>, or <code>vertex</code> pointers had not been updated
+			correctly.
+		</p>
+
+		<p>
+			A helpful strategy was to first draw a diagram of the two triangles involved
+			in the flip and explicitly label all halfedges, vertices, edges, and faces.
+			By matching these labels with the variables in the code, it became much easier
+			to reason about how each pointer should change after the flip. I also made
+			sure to collect all references to the surrounding halfedges and vertices
+			before modifying any connectivity so that I would not accidentally lose track
+			of important elements.
+		</p>
 
 		<h3>Part 5: Edge split</h3>
 		<p>
