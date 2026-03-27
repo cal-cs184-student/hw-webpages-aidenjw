@@ -48,32 +48,90 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		<b>Ray Generation and Rendering Pipeline</b>
+		<p>
+		To generate a ray, I mapped each normalized image sample coordinate
+		<code>(x, y)</code> from the range <code>[0,1] × [0,1]</code> onto the camera’s
+		sensor plane. Using the horizontal and vertical field of view, I computed the
+		corresponding position on the canonical sensor plane located one unit in front
+		of the camera. This produced a direction vector in camera space.
+		</p>
+
+		<p>
+		Next, I transformed this direction into world space using the
+		camera-to-world matrix <code>c2w</code>. After normalizing the direction vector,
+		I constructed a ray using the camera position <code>pos</code> as the origin.
+		Finally, I set the ray bounds using the near and far clipping distances
+		(<code>nClip</code> and <code>fClip</code>). Each pixel sample therefore produces
+		a ray that travels from the camera through the image plane into the scene.
+		</p>
+
+		<p>
+		Once a ray is generated, the renderer tests it against the primitives in the
+		scene. Each primitive provides an intersection routine that determines whether
+		the ray hits that object. If a hit occurs, the intersection record is updated
+		with the hit distance, surface normal, and material information. The closest
+		valid intersection along the ray is used to determine the pixel color.
+		</p>
+
+		<b>Triangle Intersection Algorithm</b>
+		<p>
+		To intersect rays with triangles, I implemented the Möller–Trumbore ray–triangle
+		intersection algorithm. The algorithm begins by computing two edge vectors of
+		the triangle. Using cross products and dot products between these edges and the
+		ray direction, we solve for the ray parameter <code>t</code> and the barycentric
+		coordinates <code>b1</code> and <code>b2</code>. These values determine where the
+		ray intersects the plane of the triangle.
+		</p>
+
+		<p>
+		If the barycentric coordinates satisfy
+		<code>b1 ≥ 0</code>, <code>b2 ≥ 0</code>, and
+		<code>b1 + b2 ≤ 1</code>, then the intersection lies inside the triangle.
+		Additionally, the intersection distance <code>t</code> must lie within the
+		valid ray interval <code>[min_t, max_t]</code>. When all conditions are met,
+		the intersection is valid. The intersection structure is then updated with the
+		hit distance and an interpolated surface normal computed from the triangle’s
+		vertex normals.
+		</p>
+
+		<p>
+		For spheres, I solved the quadratic equation obtained by substituting the ray
+		equation into the implicit equation of a sphere. This yields up to two possible
+		intersection distances. I selected the smallest valid intersection within the
+		ray bounds and computed the surface normal using the vector from the sphere
+		center to the hit point.
+		</p>
+
+		<b>Normal Shading Results</b>
+		<p>
+		I rendered several small <code>.dae</code> scenes using normal shading.
+		</p>
+
 		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			<tr>
+			<td>
+				<img src="task1_images/CBempty.png" width="400px"/>
+				<figcaption>CBempty.dae</figcaption>
+			</td>
+			<td>
+				<img src="task1_images/CBspheres.png" width="400px"/>
+				<figcaption>CBspheres.dae</figcaption>
+			</td>
+			</tr>
+			<tr>
+			<td>
+				<img src="task1_images/CBCoil.png" width="400px"/>
+				<figcaption>CBCoil.dae</figcaption>
+			</td>
+			<td>
+				<img src="task1_images/CBgems.png" width="400px"/>
+				<figcaption>CBgems.dae</figcaption>
+			</td>
+			</tr>
+		</table>
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
