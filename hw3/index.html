@@ -135,7 +135,67 @@
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<b>BVH Construction Algorithm</b>
+		<p>
+		My BVH construction algorithm begins by computing a bounding box that encloses
+		all primitives in the current range. If the number of primitives is at most the
+		maximum leaf size, I stop the recursion and create a leaf node containing that
+		subset of primitives. Otherwise, I compute the bounding box of the primitive
+		centroids and choose the axis with the largest extent. This heuristic attempts
+		to split along the direction in which the primitives are most spread out, which
+		usually produces a more balanced tree and tighter child bounding boxes.
+		</p>
+
+		<p>
+		After selecting the split axis, I choose the splitting point as the midpoint of
+		the centroid bounding box along that axis. I then partition the primitives based
+		on whether their centroid lies to the left or right of this midpoint and
+		recursively build the left and right child subtrees. If the midpoint split fails
+		to divide the primitives evenly, a median fallback can be used to prevent
+		degenerate recursion. I chose this centroid-midpoint heuristic because it is
+		simple to implement, fast to compute, and generally gives a good tradeoff
+		between build cost and traversal performance for the scenes in this project.
+		</p>
+
+		<p>
+		During traversal, each ray is first tested against the bounding box of the
+		current node. If the ray misses the box, the entire subtree can be skipped. If
+		the node is a leaf, the ray is tested directly against the primitives in that
+		leaf. Otherwise, traversal continues recursively on the child nodes. This makes
+		intersection much more efficient because most rays only visit a small fraction of
+		the total primitives in the scene.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			<tr>
+			<td>
+				<img src="task2_images/maxplanck.png" width="400px"/>
+				<figcaption>Max Planck</figcaption>
+			</td>
+			<td>
+				<img src="task2_images/CBlucy.png" width="400px"/>
+				<figcaption>CBlucy</figcaption>
+			</td>
+			</tr>
+		</table>
+		</div>
+
+		<b>Rendering Times Comparison</b>
+		<p>
+		To evaluate the effectiveness of BVH acceleration, I compared rendering times on
+		two moderately complex scenes on the s330 machines. For <code>Max Planck</code>,
+		rendering without BVH took about <code>55 seconds</code>, while rendering with BVH
+		took about <code>1.5 seconds</code>. For <code>CBlucy</code>, rendering without BVH
+		took about <code>2 minutes</code>, while rendering with BVH took about
+		<code>2 seconds</code>. These results show a dramatic speedup from BVH
+		acceleration: roughly 37× faster on Max Planck and about 60× faster on CBlucy.
+		The performance improvement is especially noticeable on scenes with many
+		triangles, where brute-force intersection becomes very expensive. Overall, the
+		BVH significantly reduces the number of primitive intersection tests per ray and
+		makes rendering complex geometry practical.
+		</p>
 
 		<h2>Part 3: Direct Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
