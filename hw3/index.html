@@ -198,8 +198,117 @@
 		</p>
 
 		<h2>Part 3: Direct Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+		<h3>Walk Through of Direct Lighting Implementations</h3>
+
+		<p><strong>Uniform Hemisphere Sampling (<code>estimate_direct_lighting_hemisphere</code>):</strong>
+		This method estimates direct lighting at a surface point by uniformly sampling directions over the 
+		hemisphere centered around the surface normal. For each sample, we draw a random direction from a 
+		uniform hemisphere distribution (pdf = 1/2π), transform it from object space to world space, and 
+		cast a ray from the hit point in that direction. If the ray intersects an emissive object (a light 
+		source), we evaluate the reflection equation: we multiply the incoming radiance from the light by 
+		the BSDF evaluation (reflectance/π for diffuse surfaces) and the cosine of the angle between the 
+		sampled direction and the surface normal, then divide by the pdf. We accumulate this over all samples 
+		and normalize by the total number of samples to produce the final Monte Carlo estimate. This approach 
+		is simple but inefficient because most sampled directions will not hit a light source, contributing 
+		zero radiance and leading to high variance (noisy images).</p>
+
+		<p><strong>Importance Sampling Lights (<code>estimate_direct_lighting_importance</code>):</strong>
+		This method improves on hemisphere sampling by sampling directions directly toward each light 
+		source in the scene rather than sampling random directions. For each light, we take <code>ns_area_light</code> 
+		samples (or just 1 for point/delta lights). Each sample uses <code>light->sample_L()</code> to get: the 
+		incoming radiance, a direction toward the light, the distance to the light, and the sampling pdf. We first 
+		check that the light is above the surface (the z-component of the direction in object space is positive). 
+		Then we cast a shadow ray from the hit point toward the light with <code>max_t = distToLight - EPS_F</code> 
+		to check for occluders. If unoccluded, we evaluate the reflection equation with the sampled radiance, BSDF, 
+		cosine term, and pdf. We average the contributions per light and sum across all lights. Because every sample 
+		is directed at a light, none are "wasted," producing much lower variance than hemisphere sampling for the 
+		same number of samples.</p>
+
+		<h3>Images Rendered with Both Implementations</h3>
+
+		<p>The following images show CBbunny rendered with both direct lighting methods using 16 samples per pixel and 8 light rays:</p>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+		<div>
+			<p><strong>Hemisphere Sampling (CBbunny, -s 16 -l 8 -H)</strong></p>
+			<img src="task3_images/CBbunny_H_16_8.png" alt="CBbunny hemisphere sampling" width="480">
+			<pre>./pathtracer -t 8 -s 16 -l 8 -H -f CBbunny_H_16_8.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		<div>
+			<p><strong>Importance Sampling (CBbunny, -s 16 -l 8)</strong></p>
+			<img src="task3_images/CBbunny_I_16_8.png" alt="CBbunny importance sampling" width="480">
+			<pre>./pathtracer -t 8 -s 16 -l 8 -f CBbunny_I_16_8.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		</div>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+		<div>
+			<p><strong>Hemisphere Sampling (CBspheres, -s 16 -l 8 -H)</strong></p>
+			<img src="task3_images/CBspheres_H_16_8.png" alt="CBspheres hemisphere sampling" width="480">
+			<pre>./pathtracer -t 8 -s 16 -l 8 -H -f CBspheres_H_16_8.png -r 480 360 ../dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>Importance Sampling (CBspheres, -s 16 -l 8)</strong></p>
+			<img src="task3_images/CBspheres_I_16_8.png" alt="CBspheres importance sampling" width="480">
+			<pre>./pathtracer -t 8 -s 16 -l 8 -f CBspheres_I_16_8.png -r 480 360 ../dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		</div>
+
+		<h3>Noise Levels in Soft Shadows (Light Sampling, varying -l)</h3>
+
+		<p>The following images show CBbunny rendered with importance 
+			sampling at 1 sample per pixel (<code>-s 1</code>) and varying 
+			numbers of light rays (<code>-l</code>). Focus on the soft shadow 
+			regions beneath the bunny and along the walls.</p>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+		<div>
+			<p><strong>1 light ray (-l 1)</strong></p>
+			<img src="task3_images/CBbunny_l1.png" alt="1 light ray" width="360">
+			<pre>./pathtracer -t 8 -s 1 -l 1 -f CBbunny_l1.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		<div>
+			<p><strong>4 light rays (-l 4)</strong></p>
+			<img src="task3_images/CBbunny_l4.png" alt="4 light rays" width="360">
+			<pre>./pathtracer -t 8 -s 1 -l 4 -f CBbunny_l4.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		</div>
+		<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
+		<div>
+			<p><strong>16 light rays (-l 16)</strong></p>
+			<img src="task3_images/CBbunny_l16.png" alt="16 light rays" width="360">
+			<pre>./pathtracer -t 8 -s 1 -l 16 -f CBbunny_l16.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		<div>
+			<p><strong>64 light rays (-l 64)</strong></p>
+			<img src="task3_images/CBbunny_l64.png" alt="64 light rays" width="360">
+			<pre>./pathtracer -t 8 -s 1 -l 64 -f CBbunny_l64.png -r 480 360 ../dae/sky/CBbunny.dae</pre>
+		</div>
+		</div>
+
+		<p>As the number of light rays increases, the soft shadow regions become noticeably smoother. 
+			With <code>-l 1</code>, the shadows are extremely noisy with harsh black-and-white speckles, 
+			since each pixel only gets a single binary sample of whether it is in shadow or not. By <code>-l 4</code>, 
+			the noise begins to reduce as the shadow estimate averages over a few samples. At <code>-l 16</code>, 
+			the soft shadow transitions become much more coherent, and by <code>-l 64</code>, the shadows are nearly 
+			smooth with only minor residual noise from having just 1 sample per pixel.</p>
+
+		<h3>Comparison: Uniform Hemisphere Sampling vs. Importance Sampling</h3>
+
+		<p>Uniform hemisphere sampling and importance sampling of lights produce the same converged result but differ 
+			dramatically in noise at equal sample counts. With hemisphere sampling, most sampled rays miss the light 
+			source entirely and contribute zero radiance, meaning only a small fraction of samples are informative. This 
+			leads to very high variance and grainy images, especially in shadow regions and on surfaces far from the light. 
+			Importance sampling, by contrast, directs every sample toward a light source, so every sample has the potential 
+			to contribute meaningful radiance information. This results in significantly cleaner images with the same number 
+			of total samples. The difference is most visible in soft shadow regions: hemisphere sampling produces noisy, 
+			speckled shadows, while importance sampling renders smooth, well-defined penumbrae. Additionally, hemisphere 
+			sampling cannot handle point light sources at all (the probability of a random ray hitting a point is zero), 
+			whereas importance sampling handles them naturally. The trade-off is that importance sampling requires access 
+			to a <code>sample_L</code> function for each light, but this is a minor implementation cost for a major quality 
+			improvement.</p>
+		
 		<h2>Part 4: Global Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
