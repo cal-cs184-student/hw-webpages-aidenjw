@@ -28,12 +28,12 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 3 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Aiden Wang, Kelly Tou</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/">https://cal-cs184-student.github.io/hw-webpages-aidenjw/</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a>
 		
 		<figure>
 			<img src="cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
@@ -45,6 +45,7 @@
 		-->
 
 		<h2>Overview</h2>
+		TODO
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
@@ -330,27 +331,26 @@
 			The est_radiance_global_illumination function combined the emitted light and recursive many bounce estimate
 			to compute the final global illumination results.
 		</p>
-		<h3>Global Illumination Renders (1024 spp)</h3>
+		<h3>Global Illumination Renders</h3>
 
 		<p>
 			The following renders show full global illumination with both direct and indirect lighting enabled.
-			All images in this section were rendered at <code>-s 1024</code> to keep noise low enough to clearly
-			show soft indirect bounce lighting and color bleeding.
+			All images in this section were rendered at 1024 samples per pixel.
 		</p>
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
 		<div>
-			<p><strong>CBbunny_1024_depth5</strong></p>
+			<p><strong>Global illumination CBbunny with depth=5</strong></p>
 			<img src="task4_images/global_illumination_1024/CBbunny_1024_depth5.png" alt="CBbunny 1024 spp depth 5" width="360">
 			<pre>./build/pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f CBbunny_1024_depth5.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBspheres_1024_depth5</strong></p>
+			<p><strong>Global illumination CBspheres with depth=5</strong></p>
 			<img src="task4_images/global_illumination_1024/CBspheres_1024_depth5.png" alt="CBspheres 1024 spp depth 5" width="360">
 			<pre>./build/pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f CBspheres_1024_depth5.png ./dae/sky/CBspheres_lambertian.dae</pre>
 		</div>
 		<div>
-			<p><strong>bench_1024_depth5</strong></p>
+			<p><strong>Global illumination bench with depth=5</strong></p>
 			<img src="task4_images/global_illumination_1024/bench_1024_depth5.png" alt="bench 1024 spp depth 5" width="360">
 			<pre>./build/pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f bench_1024_depth5.png ./dae/sky/bench.dae</pre>
 		</div>
@@ -360,18 +360,18 @@
 
 		<p>
 			I used <code>CBspheres_lambertian.dae</code> to isolate the two components of global illumination.
-			The direct-only render keeps the surfaces primarily lit by the visible light source, while the
-			indirect-only render emphasizes bounce lighting and the soft color bleeding between surfaces.
+			The direct only render keeps the surfaces primarily lit by the visible light source, while the
+			indirect only renders bouncing lighting.
 		</p>
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
 		<div>
-			<p><strong>CBspheres_1024_direct_only</strong></p>
+			<p><strong>CBspheres with direct illumination only</strong></p>
 			<img src="task4_images/direct_undirect_only/CBspheres_1024_direct_only.png" alt="CBspheres direct only" width="420">
 			<pre>./build/pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f CBspheres_1024_direct_only.png ./dae/sky/CBspheres_lambertian.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBspheres_1024_indirect_only</strong></p>
+			<p><strong>CBspheres with indirect illumination only</strong></p>
 			<img src="task4_images/direct_undirect_only/CBspheres_1024_indirect_only.png" alt="CBspheres indirect only" width="420">
 			<pre>./build/pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f CBspheres_1024_indirect_only.png ./dae/sky/CBspheres_lambertian.dae</pre>
 		</div>
@@ -387,41 +387,57 @@
 		</p>
 
 		<p>
-			The 2nd bounce adds the first strong layer of indirect fill light into the Cornell box, especially
-			under the bunny and near the colored walls, making the scene feel less flat than a direct-light-only
-			render. The 3rd bounce is subtler, but it further smooths dark regions and strengthens color bleeding,
-			which improves realism compared to rasterization by capturing light transport between surfaces rather
-			than only visibility and local shading.
+			For the unaccumulated renders, the 2nd bounce is where indirect illumination first becomes very noticeable.
+			Light reflected off the walls and floor begins to illuminate the bunny and nearby surfaces, so dark regions
+			start to fill in and the first clear signs of color bleeding appear. In the 3rd bounce, that bounced light
+			spreads farther through the Cornell box, making shadowed areas softer and the overall lighting feel more
+			natural, even though the contribution is dimmer than the 2nd bounce.
+		</p>
+
+		<p>
+			Compared to rasterization, these higher order bounces are what make the rendered image look much more realistic.
+			Rasterization usually captures only direct visibility and local shading, so surfaces can look flat and overly
+			contrasty. The 2nd and 3rd bounces add interreflection between surfaces, which produces softer shading,
+			subtle color transfer from the walls, and a stronger sense that all objects exist in the same lit environment.
+			That extra global illumination is a major reason path traced images look more believable.
+		</p>
+
+		<p>
+			Comparing the accumulated and unaccumulated sequences, the accumulated renders look more complete
+			as <code>m</code> increases because each image includes all bounce contributions up to that depth. The
+			unaccumulated renders are dimmer and more selective, since each one isolates only a single bounce order.
+			This makes the accumulated series better for showing how the final image improves with more indirect light,
+			while the unaccumulated series is more useful for understanding what each individual bounce contributes.
 		</p>
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
 		<div>
-			<p><strong>CBbunny_m0_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=0</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m0_unaccum_1024.png" alt="CBbunny m0 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 0 -o 0 -r 480 360 -f CBbunny_m0_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m1_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=1</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m1_unaccum_1024.png" alt="CBbunny m1 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 1 -o 0 -r 480 360 -f CBbunny_m1_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m2_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=2</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m2_unaccum_1024.png" alt="CBbunny m2 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 2 -o 0 -r 480 360 -f CBbunny_m2_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m3_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=3</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m3_unaccum_1024.png" alt="CBbunny m3 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 3 -o 0 -r 480 360 -f CBbunny_m3_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m4_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=4</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m4_unaccum_1024.png" alt="CBbunny m4 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 4 -o 0 -r 480 360 -f CBbunny_m4_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m5_unaccum_1024</strong></p>
+			<p><strong>Unaccumulated bounces CBbunny with m=5</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m5_unaccum_1024.png" alt="CBbunny m5 unaccumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 5 -o 0 -r 480 360 -f CBbunny_m5_unaccum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
@@ -429,32 +445,32 @@
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px;">
 		<div>
-			<p><strong>CBbunny_m0_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=0</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m0_accum_1024.png" alt="CBbunny m0 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 0 -o 1 -r 480 360 -f CBbunny_m0_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m1_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=1</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m1_accum_1024.png" alt="CBbunny m1 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 1 -o 1 -r 480 360 -f CBbunny_m1_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m2_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=2</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m2_accum_1024.png" alt="CBbunny m2 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 2 -o 1 -r 480 360 -f CBbunny_m2_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m3_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=3</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m3_accum_1024.png" alt="CBbunny m3 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 3 -o 1 -r 480 360 -f CBbunny_m3_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m4_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=4</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m4_accum_1024.png" alt="CBbunny m4 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 4 -o 1 -r 480 360 -f CBbunny_m4_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_m5_accum_1024</strong></p>
+			<p><strong>Accumulated bounces CBbunny with m=5</strong></p>
 			<img src="task4_images/cbbunny_varied_m/CBbunny_m5_accum_1024.png" alt="CBbunny m5 accumulated" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 5 -o 1 -r 480 360 -f CBbunny_m5_accum_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
@@ -464,52 +480,96 @@
 
 		<p>
 			These renders show Russian Roulette termination on <code>CBbunny.dae</code> with the same
-			1024-sample setup while varying <code>max_ray_depth</code>. I also included the extra
-			<code>CBbunny_rr10_m100_1024</code> image from the folder as an additional deep-bounce comparison.
+			1024-sample setup while varying <code>max_ray_depth</code>. The last image shows another depth=100 rendering
+			but with the russian roulette probability set to 10% to help more clearly visualize the effect.
 		</p>
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
 		<div>
-			<p><strong>CBbunny_rr30_m0_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=0</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m0_1024.png" alt="CBbunny Russian Roulette m0" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 0 -r 480 360 -f CBbunny_rr30_m0_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr30_m1_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=1</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m1_1024.png" alt="CBbunny Russian Roulette m1" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 1 -r 480 360 -f CBbunny_rr30_m1_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr30_m2_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=2</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m2_1024.png" alt="CBbunny Russian Roulette m2" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 2 -r 480 360 -f CBbunny_rr30_m2_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr30_m3_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=3</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m3_1024.png" alt="CBbunny Russian Roulette m3" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 3 -r 480 360 -f CBbunny_rr30_m3_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr30_m4_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=4</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m4_1024.png" alt="CBbunny Russian Roulette m4" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 4 -r 480 360 -f CBbunny_rr30_m4_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr30_m100_1024</strong></p>
+			<p><strong>CBbunny with p=0.3 and m=100</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr30_m100_1024.png" alt="CBbunny Russian Roulette m100" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 100 -r 480 360 -f CBbunny_rr30_m100_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_rr10_m100_1024</strong></p>
+			<p><strong>CBbunny with p=0.1 and m=100</strong></p>
 			<img src="task4_images/cbbunny_russian_varied_m/CBbunny_rr10_m100_1024.png" alt="CBbunny Russian Roulette m100 alternate" width="300">
 			<pre>./build/pathtracer -t 8 -s 1024 -m 100 -r 480 360 -f CBbunny_rr10_m100_1024.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		</div>
 
+		<h3>CBspheres with Varied Sample per Pixel</h3>
+
 		<p>
-			I did not find a Part 4 sample-per-pixel image set under <code>hw3/task4_images</code>, so I left that
-			comparison out of the HTML for now rather than inserting broken image references.
+			The following images show <code>CBspheres_lambertian.dae</code> rendered with different camera sample
+			counts while keeping the number of light rays fixed at <code>-l 4</code>. At very low sample counts,
+			the image is dominated by Monte Carlo noise, especially in the shadowed regions and on the walls. As
+			<code>s</code> increases, that noise steadily averages out, and by <code>s=1024</code> the image is much
+			cleaner and the indirect lighting is significantly more stable.
 		</p>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+		<div>
+			<p><strong>CBspheres with s=1 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s1_l4.png" alt="CBspheres s1 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 1 -l 4 -m 5 -r 480 360 -f CBspheres_s1_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=2 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s2_l4.png" alt="CBspheres s2 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 2 -l 4 -m 5 -r 480 360 -f CBspheres_s2_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=4 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s4_l4.png" alt="CBspheres s4 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 4 -l 4 -m 5 -r 480 360 -f CBspheres_s4_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=8 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s8_l4.png" alt="CBspheres s8 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 8 -l 4 -m 5 -r 480 360 -f CBspheres_s8_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=16 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s16_l4.png" alt="CBspheres s16 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 16 -l 4 -m 5 -r 480 360 -f CBspheres_s16_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=64 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s64_l4.png" alt="CBspheres s64 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 64 -l 4 -m 5 -r 480 360 -f CBspheres_s64_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		<div>
+			<p><strong>CBspheres with s=1024 and l=4</strong></p>
+			<img src="task4_images/varied_sample_per_pixel/CBspheres_s1024_l4.png" alt="CBspheres s1024 l4" width="300">
+			<pre>./build/pathtracer -t 8 -s 1024 -l 4 -m 5 -r 480 360 -f CBspheres_s1024_l4.png ./dae/sky/CBspheres_lambertian.dae</pre>
+		</div>
+		</div>
+
 
 
 
@@ -546,12 +606,12 @@
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
 		<div>
-			<p><strong>CBbunny_adaptive_2048</strong></p>
+			<p><strong>CBbunny adaptive sampling 2048 samples</strong></p>
 			<img src="task5_images/CBbunny_adaptive_2048.png" alt="CBbunny adaptive render" width="360">
 			<pre>./build/pathtracer -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f CBbunny_adaptive_2048.png ./dae/sky/CBbunny.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBbunny_adaptive_2048_rate</strong></p>
+			<p><strong>CBbunny rate</strong></p>
 			<img src="task5_images/CBbunny_adaptive_2048_rate.png" alt="CBbunny adaptive sampling rate" width="360">
 			<pre>./build/pathtracer -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f CBbunny_adaptive_2048.png ./dae/sky/CBbunny.dae</pre>
 		</div>
@@ -559,37 +619,22 @@
 
 		<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px;">
 		<div>
-			<p><strong>CBspheres_adaptive_2048</strong></p>
+			<p><strong>CBspheres adaptive sampling 2048 samples</strong></p>
 			<img src="task5_images/CBspheres_adaptive_2048.png" alt="CBspheres adaptive render" width="360">
 			<pre>./build/pathtracer -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f CBspheres_adaptive_2048.png ./dae/sky/CBspheres_lambertian.dae</pre>
 		</div>
 		<div>
-			<p><strong>CBspheres_adaptive_2048_rate</strong></p>
+			<p><strong>CBspheres rate</strong></p>
 			<img src="task5_images/CBspheres_adaptive_2048_rate.png" alt="CBspheres adaptive sampling rate" width="360">
 			<pre>./build/pathtracer -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f CBspheres_adaptive_2048.png ./dae/sky/CBspheres_lambertian.dae</pre>
 		</div>
 		</div>
 
-		<p>
-			In both scenes, adaptive sampling concentrates effort around the bunny silhouette, contact shadows,
-			sphere boundaries, and regions with strong indirect lighting variation. By contrast, the broad wall
-			areas and other smooth surfaces stabilize quickly, so the renderer can stop early there and save work
-			without noticeably affecting the final image quality.
-		</p>
 
 		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+	
 		</div>
 	</body>
 </html>
