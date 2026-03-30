@@ -632,8 +632,61 @@
 
 
 		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
+		<p>
+			For the extra credit, I implemented a jittered pixel sampler. I did this by extending the Sampler2D
+			interface with a resettable sampling sequence and creating a function <code>JitteredGridSampler2D</code> in <code>sampler.cpp</code>.
+			This jittered sampler divides the unit square into a grid and generates a random sample inside
+			each grid cell. This helps preserve the randomness while allowing for better coverage since we are guaranteed
+			1 sample for every grid cell. I then updated the path tracer to use this sampler for camera rays and reset it
+			for every pixel so each pixel would get a unique sampling pattern.
+		</p>
+
+		<p>
+			Compared to the original random sampler, this jittered sampler produces more evenly distributed samples
+			within each pixel, which reduces visible noise and aliasing when using low sample counts. The random sampler
+			occasionally has gaps in objects or clumped pixels, making the noise appear blotchy and edges irregular.
+			The jittered sampling spreads out the samples a bit more uniformly, giving the noise more stability and
+			slightly sharper edges. This is mainly only an issue at low sample counts.
+		</p>
+
+		<p>
+			Below are the 2 sphere pictures rendered with a sample count of 4. and 2 spheres with sample count of 75. Both
+			have 1 sphere rendered with my jittered random sapling and 1 with the original random sampling. 
+
+			Sample count = 4: The low sample count is used to exagerate the difference between the 2, which is much harder to see at higher counts as 
+			mentioned above. In the image using the original random sampler, it appears as if a small chunk is taken from the
+			bottom right of the left sphere, which we can see more clearly in the image using the jittered sampler. 
+
+			Sample count = 75: This higher sample count allows us to see the difference in noise more clearly.
+			By examining the textures of the walls and spheres', we can see that the unjittered sampling looks 
+			very noisy and we can easily spot clumps of 'noise' pixels together, giving it a more unnatural feeling.
+			Contrastly, the picture with jittered sampling has a much smoother finish and is very hard to identify
+			multiple 'noise' pixels in close proximity. It gives it a feel that the jittered sampling image was rendered
+			using a higher sample count (though it wasn't), allowing us to achieve better performance without changing
+			sample count.
+		</p>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+		<div>
+			<p><strong>Spheres with jittering and sample count = 4</strong></p>
+			<img src="task6_images/CBspheres_jitter_s4.png" alt="Spheres with jittering and sample count 4" width="360">
+		</div>
+		<div>
+			<p><strong>Spheres without jittering and sample count = 4</strong></p>
+			<img src="task6_images/CBspheres_no_jitter_s4.png" alt="Spheres without jittering and sample count 4" width="360">
+		</div>
+		</div>
+
+		<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px;">
+		<div>
+			<p><strong>Spheres with jittering and sample count = 75</strong></p>
+			<img src="task6_images/jittered_75.png" alt="Spheres with jittering and sample count 75" width="360">
+		</div>
+		<div>
+			<p><strong>Spheres without jittering and sample count = 75</strong></p>
+			<img src="task6_images/unjittered_75.png" alt="Spheres without jittering and sample count 75" width="360">
+		</div>
+		</div>
 	
 		</div>
 	</body>
