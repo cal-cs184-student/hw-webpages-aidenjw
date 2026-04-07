@@ -28,15 +28,15 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Final project proposal</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/">https://cal-cs184-student.github.io/hw-webpages-aidenjw/</a>
 
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a>
 
 		<br>
 		<body>
@@ -49,10 +49,10 @@
 				</p>
 				<p><strong>Team Members:</strong></p>
 				<ul>
-					<li>Member 1</li>
-					<li>Member 2</li>
-					<li>Member 3</li>
-					<li>Member 4</li>
+					<li>Sriya Kalyan</li>
+					<li>Ethan Lau</li>
+					<li>Kelly Tou</li>
+					<li>Aiden Wang</li>
 				</ul>
 			</div>
 		
@@ -60,8 +60,17 @@
 			<div class="section">
 				<h2>Problem Description</h2>
 				<p>
-					Describe the context of your idea. What problem are you solving? Why is it important?
-					What makes it challenging? Provide a high-level overview of your approach.
+					Realistic destruction effects are widely used in modern games, films, and simulation
+					systems, but generating believable fractures remains challenging because it requires
+					combining geometry processing, physically plausible fracture generation, rigid body
+					dynamics, and real-time rendering. Traditional graphics pipelines usually treat meshes
+					as static objects, so additional algorithms are needed to dynamically modify geometry
+					when an object breaks. In this project, we aim to build an interactive destruction
+					system that allows users to load a mesh, apply an impact, and observe realistic fracture
+					behavior in real time. Our approach combines procedural mesh fracturing, using
+					Voronoi-based or similar geometric partitioning methods, with rigid body simulation and
+					OpenGL-based rendering to demonstrate how geometry algorithms and physics can be
+					integrated into a responsive graphics application.
 				</p>
 			</div>
 		
@@ -71,8 +80,17 @@
 		
 				<h3>What You Plan to Deliver (Baseline)</h3>
 				<p>
-					Describe the minimum goals required for a successful project. Include expected outputs,
-					such as images, demos, or system functionality.
+					Our baseline goal is to build a working interactive destruction demo in which a user can
+					load a small set of clean triangle meshes, trigger a single fracture event, and observe
+					the resulting fragments fall, collide, and settle in real time. To keep the project
+					feasible within the course timeline, we plan to fracture each object once rather than
+					support repeated re-fracturing, restrict ourselves to a controlled collection of input
+					models, and use a lightweight physics engine such as Bullet for rigid body simulation
+					instead of implementing a full solver from scratch. The final baseline system will
+					include mesh loading, OpenGL rendering, camera controls, Voronoi-based or similarly
+					procedural one-time fracture generation, fragment simulation under gravity with ground
+					and inter-fragment collisions, and a polished demo scene that clearly shows the
+					destruction effect from impact to rest.
 				</p>
 		
 				<h3>What You Hope to Deliver (Aspirational)</h3>
