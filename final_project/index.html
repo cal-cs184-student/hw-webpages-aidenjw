@@ -175,24 +175,35 @@
 					<li>Robustness Checks: Ensure generated fragments do not contain degenerate triangles or non-manifold edges.
 					</li>
 				</ul>
-				
-				<h3>What You Hope to Deliver (Aspirational)</h3>
-				<p>
-					Describe additional goals if everything goes well. What would you build if you have extra time?
-				</p>
 
-				<h3>Evaluation</h3>
-				<p>
-					Explain how you will measure performance or quality. Examples include speed benchmarks,
-					accuracy metrics, or visual comparisons.
-				</p>
+				Example scenes include:
 
-				<h3>Key Questions</h3>
 				<ul>
-					<li>Question 1</li>
-					<li>Question 2</li>
-					<li>Question 3</li>
+					<li>A falling object breaking a mesh model several pieces as defined by our Voronoi splitting algorithm
+					</li>
+					<li>Impact-based destruction of a loaded mesh (such as an object dropping to the ground by gravity and shattering, or a bullet going through a piece of glass)
+					</li>
+					<li>Fragment collision and settling behavior</li>
 				</ul>
+
+				<h3>What You Hope to Deliver (Aspirational)</h3>
+				If time permits, we plan to extend the system with additional features:
+
+				<h4>Impact-Based Fracture</h4>
+				Instead of generating uniform fracture patterns, we will bias Voronoi seed placement toward the impact point so that more fragments appear near the collision location.
+				<h4>Progressive Fracture</h4>
+				Fragments could fracture again upon subsequent impacts, allowing multi-stage destruction.
+				<h4>Material Variation</h4>
+				We may experiment with different fracture behaviors for materials such as glass, ceramic, or stone by adjusting fragment distributions and break patterns.
+				<h4>Visual Effects</h4>
+				We may add visual enhancements such as:
+				
+				<ul>
+					<li>interior fracture shading</li>
+					<li>debris particles</li>
+					<li>dust effects</li>
+				</ul>
+				
 			</div>
 
 			<!-- Schedule -->
