@@ -1,51 +1,61 @@
 <html>
-	<head>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-		<style>
-			h1 {
-				text-align: center;
-			}
 
-			.container {
-				margin: 0 auto;
-				padding: 60px 20%;
-			}
+<head>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+	<style>
+		h1 {
+			text-align: center;
+		}
 
-			figure {
-				text-align: center;
-			}
+		.container {
+			margin: 0 auto;
+			padding: 60px 20%;
+		}
 
-			img {
-				display: inline-block;
-			}
+		figure {
+			text-align: center;
+		}
 
-			body {
-				font-family: 'Inter', sans-serif;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
+		img {
+			display: inline-block;
+		}
+
+		body {
+			font-family: 'Inter', sans-serif;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
 		<h1>CS184/284A Spring 2025 Final project proposal</h1>
 		<div style="text-align: center;">Names: Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
 
 		<br>
 
-		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/">https://cal-cs184-student.github.io/hw-webpages-aidenjw/</a>
+		Link to webpage: <a
+			href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/">https://cal-cs184-student.github.io/hw-webpages-aidenjw/</a>
 
 		<br>
 
-		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a>
+		Link to GitHub repository: <a
+			href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a>
 
 		<br>
+
 		<body>
 
 			<!-- Title, Summary, Team Members -->
 			<div class="section">
 				<h1>Project Title</h1>
-				<p><strong>Summary:</strong> 
-					Write 2–3 sentences summarizing your project. Explain what it does and why it matters.
+				<p><strong>Summary:</strong>
+					An interactive system for simulating the destruction of 3D objects uses procedural mesh fracturing
+					and rigid body dynamics. When an object experiences an impact, it fractures into multiple
+					dynamically-generated pieces that physically interact with the environment and each other. Our
+					system will combine geometric algorithms for Constructive Solid Geometry (CSG) and Voronoi
+					fracturing with rigid body simulation and real-time OpenGL rendering to produce visually realistic
+					destruction effects.
 				</p>
 				<p><strong>Team Members:</strong></p>
 				<ul>
@@ -55,55 +65,90 @@
 					<li>Aiden Wang</li>
 				</ul>
 			</div>
-		
+
 			<!-- Problem Description -->
 			<div class="section">
 				<h2>Problem Description</h2>
 				<p>
-					Realistic destruction effects are widely used in modern games, films, and simulation
-					systems, but generating believable fractures remains challenging because it requires
-					combining geometry processing, physically plausible fracture generation, rigid body
-					dynamics, and real-time rendering. Traditional graphics pipelines usually treat meshes
-					as static objects, so additional algorithms are needed to dynamically modify geometry
-					when an object breaks. In this project, we aim to build an interactive destruction
-					system that allows users to load a mesh, apply an impact, and observe realistic fracture
-					behavior in real time. Our approach combines procedural mesh fracturing, using
-					Voronoi-based or similar geometric partitioning methods, with rigid body simulation and
-					OpenGL-based rendering to demonstrate how geometry algorithms and physics can be
-					integrated into a responsive graphics application.
+					Realistic destruction effects are widely used in modern games, films, and simulation systems.
+					However, generating believable object fracture remains computationally challenging. Traditional
+					graphics pipelines typically treat meshes as static objects stored in immutable vertex buffers.
+					Simulating destruction requires dynamically modifying geometry, creating new topological structures,
+					and seamlessly passing this new data to a physics solver in real time.
 				</p>
+				<p>
+					One common technique for destruction simulation is procedural fracturing, where a mesh is divided
+					into fragments according to geometric patterns such as 3D Voronoi cells. Each fragment then becomes
+					an independent rigid body subject to physical forces and collisions. While this technique produces
+					visually convincing results, implementing it requires solving several technical challenges: robust
+					mesh clipping algorithms, proper generation of new interior faces and normals, calculating accurate
+					mass/inertia properties for procedurally-generated shapes, and interactive visualization using
+					dynamic buffer updates.
+				</p>
+				<p>
+					In this project we aim to build an interactive C++ based destruction system that allows users to
+					load an OBJ mesh, apply impacts, and observe realistic fracture behavior in real time. The system
+					will demonstrate how geometric algorithms and physics simulation can be integrated into an
+					interactive graphics application.
+				</p>	
 			</div>
-		
+
 			<!-- Goals and Deliverables -->
 			<div class="section">
 				<h2>Goals and Deliverables</h2>
-		
+
 				<h3>What You Plan to Deliver (Baseline)</h3>
-				<p>
-					Our baseline goal is to build a working interactive destruction demo in which a user can
-					load a small set of clean triangle meshes, trigger a single fracture event, and observe
-					the resulting fragments fall, collide, and settle in real time. To keep the project
-					feasible within the course timeline, we plan to fracture each object once rather than
-					support repeated re-fracturing, restrict ourselves to a controlled collection of input
-					models, and use a lightweight physics engine such as Bullet for rigid body simulation
-					instead of implementing a full solver from scratch. The final baseline system will
-					include mesh loading, OpenGL rendering, camera controls, Voronoi-based or similarly
-					procedural one-time fracture generation, fragment simulation under gravity with ground
-					and inter-fragment collisions, and a polished demo scene that clearly shows the
-					destruction effect from impact to rest.
+				<p>Our primary goal is to implement a working interactive destruction simulator with the following architectural components:
 				</p>
-		
+
+				<h4>
+					Procedural Mesh Fracturing
+				</h4>
+
+				<p>We will implement Voronoi-based fracture generation for 3D triangle meshes.</p>
+
+				Steps Include:
+
+				<ul>
+					<li>Seed Generation: Sampling seed points inside the mesh volume (using uniform random or Poisson-disk sampling).</li>
+					<li>Cell Computation: Computing 3D Voronoi cells. We will likely represent the boundaries between seeds as 3D splitting planes.
+					</li>
+					<li>Mesh Clipping: Slicing the original mesh using the splitting planes via a mesh clipping algorithm (e.g., Sutherland-Hodgman for 3D polygons).
+					</li>
+					<li>Topology Reconstruction: Generating new interior faces where the mesh was cut, ensuring the resulting fragments are closed, watertight manifolds. We will also compute new vertex normals for these interior faces to ensure proper lighting.
+					</li>
+				</ul>
+
+				<h4>
+					Rigid Body Simulation
+				</h4>
+
+				Each watertight fragment will be converted into an independent rigid body. This requires dynamically computing the volume, center of mass, and inertia tensor of each newly generated mesh. The simulation will include:
+				<ul>
+					<li><strong>Week 1:</strong> Mesh Fracturing</li>
+					<li><strong>Week 2:</strong> Task description</li>
+					<li><strong>Week 3:</strong> Task description</li>
+				</ul>
+
+
+				<h4>
+					Interactive Rendering
+				</h4>
+
+				<h4>
+					Evaluation
+				</h4>
 				<h3>What You Hope to Deliver (Aspirational)</h3>
 				<p>
 					Describe additional goals if everything goes well. What would you build if you have extra time?
 				</p>
-		
+
 				<h3>Evaluation</h3>
 				<p>
 					Explain how you will measure performance or quality. Examples include speed benchmarks,
 					accuracy metrics, or visual comparisons.
 				</p>
-		
+
 				<h3>Key Questions</h3>
 				<ul>
 					<li>Question 1</li>
@@ -111,40 +156,43 @@
 					<li>Question 3</li>
 				</ul>
 			</div>
-		
+
 			<!-- Schedule -->
 			<div class="section">
 				<h2>Schedule</h2>
 				<ul>
-					<li><strong>Week 1:</strong> Task description</li>
+					<li><strong>Week 1:</strong> Mesh Fracturing</li>
 					<li><strong>Week 2:</strong> Task description</li>
 					<li><strong>Week 3:</strong> Task description</li>
 					<li><strong>Week 4:</strong> Task description</li>
 				</ul>
 			</div>
-		
+
 			<!-- Resources -->
 			<div class="section">
 				<h2>Resources</h2>
-		
+
 				<h3>References</h3>
 				<ul>
-					<li> <a href="https://github.com/robertvaradan/voronoishatter">https://github.com/robertvaradan/voronoishatter</a></li>
+					<li> <a
+							href="https://github.com/robertvaradan/voronoishatter">https://github.com/robertvaradan/voronoishatter</a>
+					</li>
 					<li> <a href="https://www.joesfer.com/?p=60">https://www.joesfer.com/?p=60</a></li>
 				</ul>
-		
+
 				<h3>Tools and Platforms</h3>
 				<ul>
 					<li>Programming languages, libraries, frameworks</li>
 					<li>Hardware / GPUs / cloud resources</li>
 				</ul>
-		
+
 				<h3>Existing Codebases</h3>
 				<p>
 					If applicable, describe any existing systems or repositories you are building upon.
 				</p>
 			</div>
-		
+
 		</body>
-	</body>
+</body>
+
 </html>
