@@ -138,7 +138,10 @@
 					</li>
 					<li>Collision with a static ground plane and dynamic collision between fragments.
 					</li>
-					<li>Physics Implementation Choice: We will either implement a custom rigid body solver (using algorithms like the Separating Axis Theorem (SAT) or GJK for convex-hull collision detection and impulse-based resolution) or integrate a robust C++ physics library such as Bullet Physics, passing our procedural fragments to the engine as btConvexHullShape objects.
+					<li>Physics Implementation Choice: We will either implement a custom rigid body solver (using
+						algorithms like the Separating Axis Theorem (SAT) or GJK for convex-hull collision detection and
+						impulse-based resolution) or integrate a robust C++ physics library such as Bullet Physics,
+						passing our procedural fragments to the engine as btConvexHullShape objects.
 					</li>
 				</ul>
 
@@ -150,17 +153,20 @@
 				We will build an OpenGL-based renderer that supports:
 
 				<ul>
-					<li>Loading external .obj meshes and parsing them into a half-edge data structure for easy geometric manipulation.
+					<li>Loading external .obj meshes and parsing them into a half-edge data structure for easy geometric
+						manipulation.
 					</li>
-					<li>Displaying fractured fragments by dynamically updating Vertex Buffer Objects or using instanced rendering for high fragment counts.
+					<li>Displaying fractured fragments by dynamically updating Vertex Buffer Objects or using instanced
+						rendering for high fragment counts.
 					</li>
 					<li>Real-time interactive camera controls (utilizing libraries like GLM and GLFW).
 					</li>
-					<li>Time-stepping: The demo will allow users to move back and forth through timesteps to visualize the exact moments of fracture and splitting.
+					<li>Time-stepping: The demo will allow users to move back and forth through timesteps to visualize
+						the exact moments of fracture and splitting.
 					</li>
 				</ul>
 
-				
+
 
 				<h4>
 					Evaluation
@@ -169,19 +175,26 @@
 				We will evaluate our system in several ways:
 
 				<ul>
-					<li>Performance Profiling: Measuring simulation frame rate (FPS) and memory allocation times versus the number of generated fragments to identify computational bottlenecks in the clipping phase</li>
-					<li>Visual Demonstration: Showcasing varying destruction scenarios, such as falling objects shattering upon hitting the ground, and impact-based destruction of a static mesh triggered by a user’s click.
+					<li>Performance Profiling: Measuring simulation frame rate (FPS) and memory allocation times versus
+						the number of generated fragments to identify computational bottlenecks in the clipping phase
 					</li>
-					<li>Robustness Checks: Ensure generated fragments do not contain degenerate triangles or non-manifold edges.
+					<li>Visual Demonstration: Showcasing varying destruction scenarios, such as falling objects
+						shattering upon hitting the ground, and impact-based destruction of a static mesh triggered by a
+						user’s click.
+					</li>
+					<li>Robustness Checks: Ensure generated fragments do not contain degenerate triangles or
+						non-manifold edges.
 					</li>
 				</ul>
 
 				Example scenes include:
 
 				<ul>
-					<li>A falling object breaking a mesh model several pieces as defined by our Voronoi splitting algorithm
+					<li>A falling object breaking a mesh model several pieces as defined by our Voronoi splitting
+						algorithm
 					</li>
-					<li>Impact-based destruction of a loaded mesh (such as an object dropping to the ground by gravity and shattering, or a bullet going through a piece of glass)
+					<li>Impact-based destruction of a loaded mesh (such as an object dropping to the ground by gravity
+						and shattering, or a bullet going through a piece of glass)
 					</li>
 					<li>Fragment collision and settling behavior</li>
 				</ul>
@@ -190,30 +203,39 @@
 				If time permits, we plan to extend the system with additional features:
 
 				<h4>Impact-Based Fracture</h4>
-				Instead of generating uniform fracture patterns, we will bias Voronoi seed placement toward the impact point so that more fragments appear near the collision location.
+				Instead of generating uniform fracture patterns, we will bias Voronoi seed placement toward the impact
+				point so that more fragments appear near the collision location.
 				<h4>Progressive Fracture</h4>
 				Fragments could fracture again upon subsequent impacts, allowing multi-stage destruction.
 				<h4>Material Variation</h4>
-				We may experiment with different fracture behaviors for materials such as glass, ceramic, or stone by adjusting fragment distributions and break patterns.
+				We may experiment with different fracture behaviors for materials such as glass, ceramic, or stone by
+				adjusting fragment distributions and break patterns.
 				<h4>Visual Effects</h4>
 				We may add visual enhancements such as:
-				
+
 				<ul>
 					<li>interior fracture shading</li>
 					<li>debris particles</li>
 					<li>dust effects</li>
 				</ul>
-				
+
 			</div>
 
 			<!-- Schedule -->
 			<div class="section">
 				<h2>Schedule</h2>
 				<ul>
-					<li><strong>Week 1:</strong> Mesh Fracturing</li>
-					<li><strong>Week 2:</strong> Task description</li>
-					<li><strong>Week 3:</strong> Task description</li>
-					<li><strong>Week 4:</strong> Task description</li>
+					<li><strong>Week 1:</strong> Set up the C++ project scaffolding (CMake, GLFW, GLEW, GLM). Implement the mesh loader and baseline OpenGL rendering framework. Research and begin prototyping 3D plane-clipping and Voronoi seed generation.
+					</li>
+					<li><strong>Week 2:</strong> Finalize the mesh clipping algorithm. Ensure new interior faces are correctly triangulated to create watertight meshes. Map these static fragmented meshes to OpenGL Vertex Buffer Objects to create a static fracture demonstration.
+					</li>
+					<li><strong>Week 3:</strong> Integrate physics. Calculate the center of mass and inertia for the fragments. Implement/integrate the rigid body solver to handle gravity, ground collisions, and convex-hull fragment collisions. Sync physics transforms with OpenGL rendering.
+					</li>
+					<li><strong>Week 4:</strong> Add interactive impact triggers via raycasting from the camera, 
+						optimize buffer updates for better performance, 
+						implement the timestep-scrubbing feature
+						, and recording the final video and presentation
+						</li>
 				</ul>
 			</div>
 
@@ -222,23 +244,38 @@
 				<h2>Resources</h2>
 
 				<h3>References</h3>
+
+				Müller et al., Real Time Dynamic Fracture, ACM SIGGRAPH
+
+				
+
+
+				<h3>Tools and Platforms</h3>
+				We plan to use the following tools and frameworks:
+				<ul>
+					<li>Graphics: OpenGL, GLFW, GLEW</li>
+					<li>Language: C++</li>
+					<li>Mathematics: GLM</li>
+					<li>Physics: Bullet Physics Engine</li>
+					<li>Geometry Processing (Optional depending on approach): CGAL (Computational Geometry Algorithms Library)</li>
+				</ul>
+
+				<h3>Existing Codebases</h3>
+				We plan to use publicly available mesh datasets such as:
+
+				<ul>
+					<li><a href="https://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a></li>
+					<li>common benchmark models (e.g., Stanford bunny)</li>
+				</ul>
+
+				We can also compare our work with adjacent works as shown below:
+
 				<ul>
 					<li> <a
 							href="https://github.com/robertvaradan/voronoishatter">https://github.com/robertvaradan/voronoishatter</a>
 					</li>
 					<li> <a href="https://www.joesfer.com/?p=60">https://www.joesfer.com/?p=60</a></li>
 				</ul>
-
-				<h3>Tools and Platforms</h3>
-				<ul>
-					<li>Programming languages, libraries, frameworks</li>
-					<li>Hardware / GPUs / cloud resources</li>
-				</ul>
-
-				<h3>Existing Codebases</h3>
-				<p>
-					If applicable, describe any existing systems or repositories you are building upon.
-				</p>
 			</div>
 
 		</body>
