@@ -90,7 +90,7 @@
 					load an OBJ mesh, apply impacts, and observe realistic fracture behavior in real time. The system
 					will demonstrate how geometric algorithms and physics simulation can be integrated into an
 					interactive graphics application.
-				</p>	
+				</p>
 			</div>
 
 			<!-- Goals and Deliverables -->
@@ -98,7 +98,8 @@
 				<h2>Goals and Deliverables</h2>
 
 				<h3>What You Plan to Deliver (Baseline)</h3>
-				<p>Our primary goal is to implement a working interactive destruction simulator with the following architectural components:
+				<p>Our primary goal is to implement a working interactive destruction simulator with the following
+					architectural components:
 				</p>
 
 				<h4>
@@ -110,12 +111,17 @@
 				Steps Include:
 
 				<ul>
-					<li>Seed Generation: Sampling seed points inside the mesh volume (using uniform random or Poisson-disk sampling).</li>
-					<li>Cell Computation: Computing 3D Voronoi cells. We will likely represent the boundaries between seeds as 3D splitting planes.
+					<li>Seed Generation: Sampling seed points inside the mesh volume (using uniform random or
+						Poisson-disk sampling).</li>
+					<li>Cell Computation: Computing 3D Voronoi cells. We will likely represent the boundaries between
+						seeds as 3D splitting planes.
 					</li>
-					<li>Mesh Clipping: Slicing the original mesh using the splitting planes via a mesh clipping algorithm (e.g., Sutherland-Hodgman for 3D polygons).
+					<li>Mesh Clipping: Slicing the original mesh using the splitting planes via a mesh clipping
+						algorithm (e.g., Sutherland-Hodgman for 3D polygons).
 					</li>
-					<li>Topology Reconstruction: Generating new interior faces where the mesh was cut, ensuring the resulting fragments are closed, watertight manifolds. We will also compute new vertex normals for these interior faces to ensure proper lighting.
+					<li>Topology Reconstruction: Generating new interior faces where the mesh was cut, ensuring the
+						resulting fragments are closed, watertight manifolds. We will also compute new vertex normals
+						for these interior faces to ensure proper lighting.
 					</li>
 				</ul>
 
@@ -123,11 +129,17 @@
 					Rigid Body Simulation
 				</h4>
 
-				Each watertight fragment will be converted into an independent rigid body. This requires dynamically computing the volume, center of mass, and inertia tensor of each newly generated mesh. The simulation will include:
+				Each watertight fragment will be converted into an independent rigid body. This requires dynamically
+				computing the volume, center of mass, and inertia tensor of each newly generated mesh. The simulation
+				will include:
+
 				<ul>
-					<li><strong>Week 1:</strong> Mesh Fracturing</li>
-					<li><strong>Week 2:</strong> Task description</li>
-					<li><strong>Week 3:</strong> Task description</li>
+					<li>Gravity and custom linear/angular velocity integration (e.g., Semi-implicit Euler integration).
+					</li>
+					<li>Collision with a static ground plane and dynamic collision between fragments.
+					</li>
+					<li>Physics Implementation Choice: We will either implement a custom rigid body solver (using algorithms like the Separating Axis Theorem (SAT) or GJK for convex-hull collision detection and impulse-based resolution) or integrate a robust C++ physics library such as Bullet Physics, passing our procedural fragments to the engine as btConvexHullShape objects.
+					</li>
 				</ul>
 
 
@@ -135,9 +147,35 @@
 					Interactive Rendering
 				</h4>
 
+				We will build an OpenGL-based renderer that supports:
+
+				<ul>
+					<li>Loading external .obj meshes and parsing them into a half-edge data structure for easy geometric manipulation.
+					</li>
+					<li>Displaying fractured fragments by dynamically updating Vertex Buffer Objects or using instanced rendering for high fragment counts.
+					</li>
+					<li>Real-time interactive camera controls (utilizing libraries like GLM and GLFW).
+					</li>
+					<li>Time-stepping: The demo will allow users to move back and forth through timesteps to visualize the exact moments of fracture and splitting.
+					</li>
+				</ul>
+
+				
+
 				<h4>
 					Evaluation
 				</h4>
+
+				We will evaluate our system in several ways:
+
+				<ul>
+					<li>Performance Profiling: Measuring simulation frame rate (FPS) and memory allocation times versus the number of generated fragments to identify computational bottlenecks in the clipping phase</li>
+					<li>Visual Demonstration: Showcasing varying destruction scenarios, such as falling objects shattering upon hitting the ground, and impact-based destruction of a static mesh triggered by a user’s click.
+					</li>
+					<li>Robustness Checks: Ensure generated fragments do not contain degenerate triangles or non-manifold edges.
+					</li>
+				</ul>
+				
 				<h3>What You Hope to Deliver (Aspirational)</h3>
 				<p>
 					Describe additional goals if everything goes well. What would you build if you have extra time?
