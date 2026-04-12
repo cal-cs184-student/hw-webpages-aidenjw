@@ -113,7 +113,82 @@
 		</div> -->
 
 		<h2>Part 2: Simulation via numerical integration</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<br>
+		The spring constant <code>ks</code> controls how stiff the cloth is. When <code>ks</code> is very low, the springs are weak, 
+		so the cloth stretches more easily under gravity, sags more, and looks softer and looser as it falls. It tends to deform 
+		significantly before reaching its resting state. When <code>ks</code> is very high, the cloth is much stiffer, so it resists 
+		stretching, stays more taut, and does not droop as much. In the final resting state, a high-<code>ks</code> cloth keeps its 
+		shape better, while a low-<code>ks</code> cloth looks much more flexible and saggy.
+		<br><br>
+		<br>
+		Density changes how heavy the cloth is. A higher density means each point mass has more mass, so the cloth falls with more 
+		inertia and tends to form deeper folds or stronger wave-like motion before settling. A lower density makes the cloth lighter, 
+		so it moves more gently and usually settles with less dramatic motion. Density changes how strongly gravity and inertia affect the cloth’s motion.
+		<br><br>
+		<br>
+		Damping controls how quickly the cloth loses energy over time. With low damping, the cloth keeps moving for much longer, so 
+		it swings and oscillates noticeably before settling. With high damping, the cloth loses energy more quickly, so it reaches 
+		its final resting state faster and with less bouncing. At extremely low damping, the cloth can continue moving for a very 
+		long time, while at very high damping it settles much more quickly and appears less lively.
+		<br><br>
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;"> 
+			<table style="width: 100%; text-align: center; border-collapse: collapse;"> 
+				<tr> 
+					<td style="text-align: center;"> <img src="part2_images/low_ks.png" width="400px"/> 
+					<figcaption>Placeholder: very low ks = 1 N/m</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/default.png" width="400px"/> 
+					<figcaption>default ks = 5000 N/m</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/high_ks.png" width="400px"/> 
+					<figcaption>very high ks = 100000 N/m</figcaption> </td> 
+				</tr> 
+			</table> 
+		</div>
+		For <code>ks</code>, the most noticeable difference is how much the cloth stretches and sags. In the low-<code>ks</code> image, 
+		the cloth appears much softer and droop more heavily. In the high-<code>ks</code> image, the cloth looks more rigid 
+		and taut, with much less bending and stretching. These differences are especially noticeable both during the fall and in the 
+		final resting state.
+		<br><br>
+		<div style="display: flex; flex-direction: column; align-items: center;"> 
+			<table style="width: 100%; text-align: center; border-collapse: collapse;"> 
+				<tr> 
+					<td style="text-align: center;"> <img src="part2_images/low_density.png" width="400px"/> 
+					<figcaption>low density = 1 g/cm^2</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/default.png" width="400px"/> 
+					<figcaption>default density = 15 g/cm^2</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/high_density.png" width="400px"/> 
+					<figcaption>high density = 1000 g/cm^2</figcaption> </td> 
+				</tr> 
+			</table> 
+		</div>
+		For density, the main visible difference is how strongly the cloth responds to gravity and inertia. In the low-density case, 
+		the cloth looks lighter and move more gently. In the high-density case, the cloth falls more heavily and may show 
+		deeper folds or stronger wave-like motion before settling. These differences are often easiest to see while the cloth is in 
+		motion, rather than only at the very end.
+		<br><br>
+		<div style="display: flex; flex-direction: column; align-items: center;"> 
+			<table style="width: 100%; text-align: center; border-collapse: collapse;"> 
+				<tr> 
+					<td style="text-align: center;"> <img src="part2_images/low_damp.png" width="400px"/> 
+					<figcaption>low damping = 0%</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/default.png" width="400px"/> 
+					<figcaption>default damping = 0.2%</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part2_images/high_damp.png" width="400px"/> 
+					<figcaption>high damping = 1%</figcaption> </td> 
+				</tr> 
+			</table> 
+		</div>
+		For damping, the biggest difference is how long the cloth continues to oscillate. In the low-damping case, the cloth 
+		keeps swinging and fluttering for a long time before coming to rest. In the high-damping case, the cloth settles much 
+		faster and show far less bouncing. These differences are most noticeable shortly after the simulation starts and during the 
+		settling process.
+		<br>
+
+		<p>Here is a screenshot of our shaded cloth from <i>scene/pinned4.json</i> in its final resting state with default parameters.</p>
+		<figure>
+			<img src="part2_images/pinned4.png" alt="" style="width:100%"/>
+			<figcaption>resting <i>scene/pinned.4</i>, default parameters</figcaption>
+		</figure>
 
 		<h2>Part 3: Handling collisions with other objects</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
