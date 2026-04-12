@@ -191,7 +191,64 @@
 		</figure>
 
 		<h2>Part 3: Handling collisions with other objects</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<b>Implementation of handling collisions with spheres and planes</b>
+		<br>
+		For sphere collisions, I first computed the vector from the sphere’s center to the point mass and checked whether the point 
+		mass was inside or on the sphere. If it was, I normalized that direction vector and used it to find the tangent point on the 
+		sphere’s surface. I then computed the correction vector from the point mass’s <code>last_position</code> to that tangent point, 
+		and updated the point mass’s new position by moving it along that correction vector scaled by <code>(1 - friction)</code>. 
+		This bumps the point mass back onto the sphere’s surface while accounting for friction.
+		<br><br>
+		For plane collisions, I checked whether the point mass crossed the plane during the current timestep by comparing the signs of 
+		the dot products from the current and previous positions against the plane normal. If the signs differed, then the point mass 
+		crossed the plane. I computed the tangent point by intersecting the line segment from <code>last_position</code> to 
+		<code>position</code> with the plane. Then I offset that tangent point slightly along the plane normal using 
+		<code>SURFACE_OFFSET</code> so that the point mass would end up just above the plane on the same side it started from. Finally, 
+		I computed the correction vector from <code>last_position</code> to this offset tangent point and updated the position using 
+		the correction scaled by <code>(1 - friction)</code>.
+		<br><br>
+		In <code>Cloth::simulate</code>, after Verlet integration, I iterated through every point mass and tested it against every 
+		collision object in the scene by calling <code>obj->collide(pm)</code>. This ensures that all point masses respond to both 
+		spheres and planes before the spring-length correction step.
+		<br><br>
+		<b>
+		Shaded cloth from <code>scene/sphere.json</code> in its final resting state on the sphere using 
+		the default <code>ks = 5000</code> as well as with <code>ks = 500</code> and <code>ks = 50000</code>.
+		</b>
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;"> 
+			<table style="width: 100%; text-align: center; border-collapse: collapse;"> 
+				<tr> 
+					<td style="text-align: center;"> <img src="part3_images/sphere_low_ks.png" width="400px"/> 
+					<figcaption>shaded cloth on sphere with ks = 500</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part3_images/sphere_default_ks.png" width="400px"/> 
+					<figcaption>shaded cloth on sphere with ks = 5000</figcaption> </td> 
+					<td style="text-align: center;"> <img src="part3_images/sphere_high_ks.png" width="400px"/> 
+					<figcaption>shaded cloth on sphere with ks = 50000</figcaption> </td> 
+				</tr> 
+			</table> 
+		</div>
+		When the cloth is simulated on the sphere with a low spring constant such as <code>ks = 500</code>, it behaves like a much 
+		softer material. It stretches more easily and droops further around the sphere, so the cloth conforms more closely to the 
+		sphere’s shape and hangs lower between pinned points. With the default <code>ks = 5000</code>, the cloth still drapes 
+		naturally over the sphere, but it does not stretch as dramatically and looks more balanced between flexibility and stiffness.
+		<br><br>
+		With a very high spring constant such as <code>ks = 50000</code>, the cloth is much stiffer and resists stretching. As a 
+		result, it does not wrap around the sphere as tightly, and its final resting shape appears more taut and elevated. Overall, 
+		increasing <code>ks</code> makes the cloth look less saggy and more rigid, while decreasing <code>ks</code> makes the cloth 
+		look softer and more elastic.
+		<br><br>
+		<b>Shaded cloth lying peacefully at rest on the plane</b>
+		<br>
+		<div style="display: flex; flex-direction: column; align-items: center;"> 
+			<img src="part3_images/plane.png" width="500px"/> 
+			<figcaption>shaded cloth at rest on the plane with default parameters</figcaption> 
+		</div>
+		The cloth resting on the plane comes to a stable state after gravity pulls it downward and plane collision handling prevents 
+		any point masses from passing through the surface. The <code>SURFACE_OFFSET</code> keeps the cloth slightly above the plane, 
+		which helps avoid numerical issues and prevents the cloth from appearing to clip into the surface. In the final resting state, 
+		the cloth lies flat against the plane.
+		<br><br>
 
 		<h2>Part 4: Handling self-collisions</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
