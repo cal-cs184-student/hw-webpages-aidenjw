@@ -251,8 +251,145 @@
 		<br><br>
 
 		<h2>Part 4: Handling self-collisions</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+			As by the instructions, I implemented self-collision using spatial hashing so the algorithm would run in linear time rather than O(n^2).
+			Every time we simulate the scene, after the Verlet integration updates the point masses, <code>Cloth::simulate</code> calls <code>build_spatial_map()</code>.
+			This resets the previous timestamp's hash map, then places every point mass in a 3 dimentional spatial bucket based on its current position. <code>hash_position()</code>
+			converts each point mass position into integer cell cooridates by dividing teh bucket dimensions and taking the floor of the results. These cell coordinates are combined
+			to create a single hash key, which is used to store the point mass in my hash map. In the simulation step, we call <code>self_collide()</code> on all of these point masses.
+			This looks up other masses in the same spatial bucket, checking whether neighbors are closer than twice the thickness (if they are touching). If so, it computes a 
+			vector to correct this, pushing the point mass away from its neighbor so the pair remain at least twice the thickness apart. All these correction vectors
+			for each point mass are acumulated and averaged.
 
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/basic/starting.png" width="300px"/>
+						<figcaption>Starting state</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/basic/falling1.png" width="300px"/>
+						<figcaption>Falling, early stage</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/basic/falling2.png" width="300px"/>
+						<figcaption>Falling, later stage</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/basic/fell.png" width="300px"/>
+						<figcaption>Fully fallen cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/basic/flattened.png" width="300px"/>
+						<figcaption>Fallen cloth flattening (several iterations after it has fallen)</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<br>
+		<h3>Increased/Decreased density case:</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_density/starting_to_fall.png" width="300px"/>
+						<figcaption>Increased density: starting to fall</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_density/starting_fall.png" width="300px"/>
+						<figcaption>Decreased density: starting to fall</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_density/falling.png" width="300px"/>
+						<figcaption>Increased density: falling</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_density/falling.png" width="300px"/>
+						<figcaption>Decreased density: falling</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_density/fell.png" width="300px"/>
+						<figcaption>Increased density: fully fallen cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_density/fell.png" width="300px"/>
+						<figcaption>Decreased density: fully fallen cloth</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_density/fell_flattened.png" width="300px"/>
+						<figcaption>Increased density: fallen cloth flattening</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_density/fell_flattened.png" width="300px"/>
+						<figcaption>Decreased density: fallen cloth flattening</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			I changed the density from 15 to 5 and 30 g/cm^2 in this part. I found that the denser cloths tends to fall faster with more folds/wrinkles, and also takes
+			a long time to unravel after it completely fell. Similarly, the less dense cloth fell with less folds and unraveled much faster after it fell.
+		</p>
+		<br>
+		<h3>Increased/Decreased ks case:</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_ks/starting_fall.png" width="300px"/>
+						<figcaption>Increased ks: starting to fall</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_ks/starting_fall.png" width="300px"/>
+						<figcaption>Decreased ks: starting to fall</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_ks/falling.png" width="300px"/>
+						<figcaption>Increased ks: falling</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_ks/falling.png" width="300px"/>
+						<figcaption>Decreased ks: falling</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_ks/fallen.png" width="300px"/>
+						<figcaption>Increased ks: fully fallen cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_ks/fell.png" width="300px"/>
+						<figcaption>Decreased ks: fully fallen cloth</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part4_images/increased_ks/fallen_flattened.png" width="300px"/>
+						<figcaption>Increased ks: fallen cloth flattening</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part4_images/decreased_ks/fell_flattened.png" width="300px"/>
+						<figcaption>Decreased ks: fallen cloth flattening</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			I changed the spring constant from 5000 to 2500 and 10000 in this part. When ks is larger, the cloth appears more stiff and results in fewer folds
+			as it collides with itself. When ks is small, there are much more folds and the cloth looks much more soft.
+		</p>
 		<h2>Part 5: Shaders</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
