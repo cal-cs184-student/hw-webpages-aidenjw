@@ -391,21 +391,127 @@
 			as it collides with itself. When ks is small, there are much more folds and the cloth looks much more soft.
 		</p>
 		<h2>Part 5: Shaders</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h3>Shader Programs</h3>
+		<p>
+			A shader is a program that uses the GPU and is part of the graphics pipeline. Instead of using the CPU to compute the every pixel's color, we send
+			mesh data, uniforms, and textures to the GPU all at once, which runs the code in parallel. Vertex shaders run once per vertex. They take the 
+			position, normal, tangent, and UV coordinates, transforming them into the screen space, and passing the interpolated data to the next stage.
+			Fragment shaders then run for each rasterized fragment or for every potential pixel. They use the interpolated world position, normal, UVs, textures, and
+			other information to compute the final output color. Togther they are used to create lighting and material effects. On a higher level, this can be thought of as
+			first placing the objects on the scene, then deciding how visible each point on the objects should look.
+		</p>
+		<h3>Blinn Phong Shading</h3>
+		<p>
+			Blinn Phong shading is a local lighting model that approximates how a surface interacts with light. It consists of ambient, diffuse, and specular light.
+			The ambient factor is the constant base illumination, representing indirect light in the sun. This is mainly so surfaces facign away from the 
+			light aren't completely black. The diffuse term models the matte reflection. It's dependent on angles between the surface normal and light direction, so the 
+			more the surface faces the light, the brighter that surface will be. The specular term models the shinyness of the surface. This is done through a halfway vector between
+			the light direction and the view direction. The more the surface normal aligns with this halfway vector, the shinier the surface appears. 
+		</p>
+		<h3>Texture Mapping Shader</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/custom_text/Screenshot 2026-04-19 at 2.16.13 AM.png" width="300px"/>
+						<figcaption>Custom texture mapping shader</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/custom_text/Screenshot 2026-04-19 at 2.17.17 AM.png" width="300px"/>
+						<figcaption>Custom texture mapping shader with alternate texture</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
 
+		<h3>Bump and Displacement Mapping</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/bump_cloth.png" width="300px"/>
+						<figcaption>Bump mapping on cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/bump_sphere.png" width="300px"/>
+						<figcaption>Bump mapping on sphere</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/displacement_sphere.png" width="300px"/>
+						<figcaption>Displacement mapping on sphere</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/exaggerated_displacement_sphere.png" width="300px"/>
+						<figcaption>Exaggerated displacement mapping on sphere</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			Bump and displacement mapping both utilize height mapps, but the main difference is bump mapping only changes the normals used for 
+			lighting. This makes the geometry stay the same, so the surface looks bumpy but the silhouette and shadows remain unchanged.
+			Displacement mapping moves the vertices along their normals using the height map, changing the geometry of the surface. This
+			makes the surface and silhouette look more detailed and have more texture. It's kind of difficult to see the difference in the images,
+			but if we look closely at the spheres, we can see the silhouette of the bump mapped sphere is perfectly round, while the 
+			displacement sphere has a slightly jagged silhouette. The difference can more easily be seen in the exaggerated displacement sphere.
+		</p>
+
+		<h3>Sphere Mesh Coarseness Comparison</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/bump_sphere_16.png" width="300px"/>
+						<figcaption>Bump mapping on sphere, -o 16 -a 16</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/bump_sphere_128.png" width="300px"/>
+						<figcaption>Bump mapping on sphere, -o 128 -a 128</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/displacement_sphere_16.png" width="300px"/>
+						<figcaption>Displacement mapping on sphere, -o 16 -a 16</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/bump_displacement/displacement_sphere_128.png" width="300px"/>
+						<figcaption>Displacement mapping on sphere, -o 128 -a 128</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			The differences between the low resolution and high resolutions are difficult to see but still apparent in the images.
+			With <code>-o 16 -a 16</code>, the bump mapping still shows detail since the effect is compute per fragment, though the sphere mesh
+			looks a bit more coarse. The displacement appears a bit blocky since the height map is hard to represent with a low resolution.
+			With the higher resolution, the bump mapping looks similar but slightly smoother. The displacement mappings' improvement is more 
+			noticeable, as the added vertices make the height map appear smoother and less blocky.
+		</p>
+
+		<h3>Mirror Shader</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/mirror/mirror_cloth.png" width="300px"/>
+						<figcaption>Mirror shader on cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/mirror/mirror_sphere.png" width="300px"/>
+						<figcaption>Mirror shader on sphere</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
 		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+
 		</div>
 	</body>
 </html>
