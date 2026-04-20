@@ -4,98 +4,337 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>CS184/284A Final Project Milestone</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default"></script>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+	<title>Interactive Geometry Destruction Simulator Milestone</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 	<style>
-		h1 {
-			text-align: center;
+		:root {
+			--ink: #17201c;
+			--muted: #52615b;
+			--line: #cfd8d3;
+			--paper: #fbfcfb;
+			--accent: #006a67;
+			--soft: #eef5f1;
 		}
 
-		.container {
-			margin: 0 auto;
-			padding: 60px 20%;
-		}
-
-		figure {
-			text-align: center;
-		}
-
-		img {
-			display: inline-block;
+		* {
+			box-sizing: border-box;
 		}
 
 		body {
-			font-family: 'Inter', sans-serif;
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+			font-family: "Inter", Arial, sans-serif;
+			font-size: 15px;
+			line-height: 1.55;
+		}
+
+		main {
+			width: min(980px, calc(100% - 32px));
+			margin: 0 auto;
+			padding: 36px 0 48px;
+		}
+
+		header {
+			border-bottom: 2px solid var(--line);
+			padding-bottom: 18px;
+			margin-bottom: 22px;
+		}
+
+		h1 {
+			margin: 0 0 8px;
+			font-size: clamp(30px, 4vw, 46px);
+			line-height: 1.08;
+			letter-spacing: 0;
+		}
+
+		h2 {
+			margin: 24px 0 8px;
+			font-size: 21px;
+			line-height: 1.2;
+			letter-spacing: 0;
+		}
+
+		p {
+			margin: 0 0 10px;
+		}
+
+		a {
+			color: var(--accent);
+			font-weight: 600;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		.meta {
+			display: grid;
+			gap: 4px;
+			color: var(--muted);
+		}
+
+		.link-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px 18px;
+			margin-top: 12px;
+		}
+
+		.callout {
+			background: var(--soft);
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			padding: 14px 16px;
+			margin: 16px 0 6px;
+		}
+
+		ul,
+		ol {
+			margin: 8px 0 0 20px;
+			padding: 0;
+		}
+
+		li {
+			margin: 4px 0;
+		}
+
+		.accomplishments {
+			columns: 2;
+			column-gap: 34px;
+		}
+
+		.accomplishments li {
+			break-inside: avoid;
+		}
+
+		.gallery {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 12px;
+			margin: 14px 0 6px;
+		}
+
+		figure {
+			margin: 0;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			overflow: hidden;
+			background: white;
+		}
+
+		img {
+			display: block;
+			width: 100%;
+			aspect-ratio: 4 / 3;
+			object-fit: cover;
+		}
+
+		figcaption {
+			min-height: 54px;
+			padding: 8px 10px;
+			color: var(--muted);
+			font-size: 12px;
+			line-height: 1.35;
+		}
+
+		.two-col {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 24px;
+		}
+
+		code {
+			font-family: "SFMono-Regular", Consolas, monospace;
+			font-size: 0.93em;
+		}
+
+		@media print {
+			body {
+				font-size: 11px;
+				line-height: 1.35;
+			}
+
+			main {
+				width: 100%;
+				padding: 0;
+			}
+
+			header {
+				margin-bottom: 12px;
+				padding-bottom: 10px;
+			}
+
+			h1 {
+				font-size: 25px;
+			}
+
+			h2 {
+				font-size: 15px;
+				margin: 13px 0 5px;
+			}
+
+			.gallery {
+				gap: 8px;
+			}
+
+			figcaption {
+				min-height: 0;
+				font-size: 9px;
+				padding: 5px 6px;
+			}
+
+			.callout {
+				padding: 8px 10px;
+				margin: 8px 0;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.accomplishments {
+				columns: 1;
+			}
+
+			.gallery,
+			.two-col {
+				grid-template-columns: 1fr;
+			}
 		}
 	</style>
 </head>
 
 <body>
-	<div class="container">
-		<h1>CS184/284A Spring 2025 Final Project Milestone</h1>
-		<div style="text-align: center;">Names: Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
+	<main>
+		<header>
+			<h1>Interactive Geometry Destruction Simulator</h1>
+			<div class="meta">
+				<div><strong>Team:</strong> Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
+				<div><strong>Milestone Report:</strong> CS184/284A Final Project</div>
+			</div>
+			<div class="link-row">
+				<a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/milestone_webpage.html">Milestone webpage</a>
+				<a href="https://github.com/Elau2/graphics-final-project">Project repository</a>
+				<a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">Webpage repository</a>
+				<a href="https://www.youtube.com/watch?v=BT_0dcrKqs0">Milestone video demo</a>
+				<a href="index.html">Original proposal</a>
+			</div>
+		</header>
 
-		<br>
-
-		Link to webpage: <a
-			href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/">https://cal-cs184-student.github.io/hw-webpages-aidenjw/</a>
-
-		<br>
-
-		Link to GitHub repository: <a
-			href="https://github.com/Elau2/graphics-final-project">https://github.com/Elau2/graphics-final-project</a>
-
-		<br>
-
-		Link to proposal: <a href="index.html">Final Project Proposal</a>
-
-		<div class="section">
-			<h2>Project Overview</h2>
+		<section>
+			<h2>Project Summary</h2>
 			<p>
-				Our project focuses on building an interactive destruction simulation system for 3D objects.
-				The system combines procedural mesh fracturing, rigid body simulation, and OpenGL rendering to
-				show objects breaking into independently simulated fragments after impact.
+				We are building an interactive OpenGL destruction simulator that fractures closed triangle meshes into
+				smaller fragments and simulates those fragments as rigid bodies. The current system supports OBJ mesh
+				loading, Voronoi-style procedural fracture, a uniform-grid fracture baseline, real-time rigid-body
+				motion, ground collisions, fragment interactions, timestep recording and scrubbing, and click-based
+				impact events.
 			</p>
-		</div>
+		</section>
 
-		<div class="section">
-			<h2>Milestone Progress</h2>
-			<p>
-				We have begun implementing the core project scaffolding and researching the main geometric and
-				physics components needed for fracture simulation. This includes setting up the rendering pipeline,
-				planning the mesh representation, and investigating Voronoi-based fracture generation.
+		<section>
+			<h2>What We Have Accomplished</h2>
+			<ul class="accomplishments">
+				<li>Built the C++17/OpenGL application scaffold with CMake, GLFW, GLEW, GLM, shaders, camera controls,
+					and dynamic mesh rendering.</li>
+				<li>Implemented OBJ loading and normalization so external meshes can be loaded consistently.</li>
+				<li>Implemented Voronoi-style fracture by generating seed points and clipping the source mesh against
+					perpendicular bisector planes.</li>
+				<li>Implemented watertight mesh clipping with cap reconstruction, edge-intersection deduplication, and
+					normal recomputation.</li>
+				<li>Added a uniform-grid fracture method for comparison against the Voronoi approach.</li>
+				<li>Computed fragment mass properties using signed tetrahedral integration: volume, center of mass, and
+					inertia tensor.</li>
+				<li>Built a custom rigid-body simulation with gravity, semi-implicit integration, quaternion orientation
+					updates, damping, ground collision, approximate body-body collision, impulses, friction, positional
+					correction, and sleeping.</li>
+				<li>Added interaction controls for camera movement, fragment count changes, refracturing, Voronoi/uniform
+					switching, right-click impacts, explosion impulses, reset, pause/play, and timestep scrubbing.</li>
+			</ul>
+			<p class="callout">
+				Relevant implementation files include <code>VoronoiFracture.cpp</code>, <code>UniformFracture.cpp</code>,
+				<code>MeshClipper.cpp</code>, <code>MeshProperties.cpp</code>, <code>PhysicsWorld.cpp</code>,
+				<code>Application.cpp</code>, and <code>TimestepRecorder.cpp</code>.
 			</p>
-		</div>
+		</section>
 
-		<div class="section">
+		<section>
 			<h2>Preliminary Results</h2>
 			<p>
-				Our current work is focused on creating a stable foundation for loading and rendering meshes, then
-				extending that pipeline to support dynamically generated fractured pieces. As the fracture pipeline
-				comes together, we will add screenshots and demonstrations of the intermediate results here.
+				Our preliminary results show that the system can load meshes, split them into independently rendered
+				fragments, and simulate their motion under gravity. Voronoi fracture produces irregular polyhedral
+				fragments, while the uniform-grid baseline produces more block-like pieces. The impact-biased mode
+				creates denser fracture patterns near the clicked point, producing a more localized damage effect.
 			</p>
-		</div>
-
-		<div class="section">
-			<h2>Remaining Work</h2>
-			<ul>
-				<li>Finalize procedural mesh clipping and interior face generation.</li>
-				<li>Connect generated fragments to rigid body simulation.</li>
-				<li>Add interactive impact controls and real-time visualization.</li>
-				<li>Profile performance and prepare final demonstration media.</li>
-			</ul>
-		</div>
-
-		<div class="section">
-			<h2>Updated Schedule</h2>
+			<div class="gallery">
+				<figure>
+					<img src="milestone_images/cube.png" alt="Fractured cube before major collision">
+					<figcaption>Freshly fractured cube fragments before the scene fully settles.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/cube_collision.png" alt="Cube fragments after collision">
+					<figcaption>Cube fragments after falling and colliding with the ground.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/teapot.png" alt="Fractured teapot simulation">
+					<figcaption>Teapot mesh loaded from OBJ and split into simulated fragments.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/teapot_collision.png" alt="Teapot fragments during collision">
+					<figcaption>Teapot fragments interacting during the rigid-body simulation.</figcaption>
+				</figure>
+			</div>
 			<p>
-				We are continuing with the original project schedule, prioritizing a complete baseline destruction
-				pipeline before adding aspirational features such as impact-biased fracture patterns, progressive
-				fracture, and enhanced visual effects.
+				We also recorded a short demo video showing the current simulator behavior:
+				<a href="https://www.youtube.com/watch?v=BT_0dcrKqs0">https://www.youtube.com/watch?v=BT_0dcrKqs0</a>.
 			</p>
-		</div>
-	</div>
+		</section>
+
+		<section class="two-col">
+			<div>
+				<h2>Progress Relative to Plan</h2>
+				<p>
+					We are on track with the core baseline goals: mesh loading, OpenGL rendering, Voronoi fracture, an
+					alternative fracture method, rigid-body simulation, interaction, and timestep scrubbing are all
+					present in the current prototype.
+				</p>
+				<p>
+					One major design change is that we implemented a custom rigid-body solver instead of integrating
+					Bullet Physics. This keeps the system self-contained and gives us more direct control, but our
+					fragment-fragment collision is still approximate. The current narrow phase uses a simplified
+					vertex-inside-AABB style test rather than a full convex collision method such as SAT or GJK.
+				</p>
+				<p>
+					The main remaining issues are visual overlap between debris pieces, jittery settling when fragments
+					interact, several hotkeys that need debugging such as the fragment-count arrows, and general visual
+					polish for the final demo.
+				</p>
+			</div>
+
+			<div>
+				<h2>Updated Work Plan</h2>
+				<ol>
+					<li>Improve fragment collision robustness and resting behavior, especially for irregular meshes and
+						higher fragment counts.</li>
+					<li>Fix broken hotkeys, including increasing and decreasing the fragment count.</li>
+					<li>Test more OBJ assets such as teapot, cow, bunny-like models, and Suzanne.</li>
+					<li>Collect performance measurements for fracture time and simulation FPS as fragment count increases.</li>
+					<li>Polish lighting, materials, colors, and overall presentation quality.</li>
+					<li>Record final demo videos showing Voronoi fracture, uniform fracture comparison, impact-biased
+						damage, and timestep scrubbing.</li>
+					<li>Prepare the final webpage with screenshots, algorithm explanation, performance graphs, and video.</li>
+				</ol>
+			</div>
+		</section>
+
+		<section>
+			<h2>Updated Scope</h2>
+			<p>
+				We have achieved most of the baseline system: procedural fracture, rigid-body simulation, rendering,
+				interaction, and comparison against a simpler fracture method. For the final deliverable, our priority is
+				to make the demo stable and visually clear rather than adding many new features. Aspirational features
+				such as progressive re-fracture, material-specific fracture behavior, dust, and debris particles will be
+				added only after the main pipeline is robust.
+			</p>
+		</section>
+	</main>
 </body>
 
 </html>
