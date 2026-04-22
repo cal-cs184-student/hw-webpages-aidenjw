@@ -32,15 +32,15 @@
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/hw4/index.html">https://cal-cs184-student.github.io/hw-webpages-aidenjw/hw4/index.html</a>
 
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw4-clothsim-spring-breakers">https://github.com/cal-cs184-student/hw4-clothsim-spring-breakers</a>
 
 		<figure>
 			<img src="clothsim.png" alt="Cloth draped over sphere" style="width:70%"/>
-			<figcaption>You can add images with captions!</figcaption>
+			<figcaption>Cloth simulation with the cloth draped over a sphere.</figcaption>
 		</figure>
 
 		<!--
@@ -48,7 +48,18 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		<p>
+			In this homework, we implemented a mass-spring cloth simulator with structural, shearing, and bending springs,
+			Verlet-style numerical integration, collision handling, self-collision, and several GLSL shaders. The simulator
+			models cloth as a grid of point masses connected by constraints, then updates those point masses over time under
+			external forces, damping, collision responses, and spring-length corrections.
+		</p>
+		<p>
+			The most interesting part of the assignment was seeing how many small modeling choices affect the final motion.
+			Changing spring stiffness, density, damping, collision friction, spatial hashing, or shader normals can make the
+			same cloth look light and fluttery, heavy and sagging, smooth, bumpy, or reflective. This made the project feel
+			like a useful bridge between physical simulation and visual rendering.
+		</p>
 
 		<h2>Part 1: Masses and springs</h2>
 
@@ -136,7 +147,7 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;"> 
 				<tr> 
 					<td style="text-align: center;"> <img src="part2_images/low_ks.png" width="400px"/> 
-					<figcaption>Placeholder: very low ks = 1 N/m</figcaption> </td> 
+					<figcaption>Very low ks = 1 N/m</figcaption> </td> 
 					<td style="text-align: center;"> <img src="part2_images/default.png" width="400px"/> 
 					<figcaption>default ks = 5000 N/m</figcaption> </td> 
 					<td style="text-align: center;"> <img src="part2_images/high_ks.png" width="400px"/> 
@@ -408,7 +419,7 @@
 			more the surface faces the light, the brighter that surface will be. The specular term models the shinyness of the surface. This is done through a halfway vector between
 			the light direction and the view direction. The more the surface normal aligns with this halfway vector, the shinier the surface appears. 
 		</p>
-		<h3>Extra Credit Images</h3>
+		<h3>Extra Credit Shader Images for part 5</h3>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
