@@ -549,8 +549,55 @@
 				</tr>
 			</table>
 		</div>
-		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h2>Part 6: Extra Credit - Additional cloth simulation features!</h2>
+		<p>
+			For the extra credit, I implemented a spatially varying wind force to the simulation. The wind force changes based on each point mass's current 
+			position and the surface normal. This was done by computing a fixed wind direction and a sinusoidal gust value based on the 
+			position. This makes different parts of the same surface/cloth experience varying wind strengths, which is why the screenshots below appear
+			to show the cloth being blown away realistically. To more easily see the effects of the wind, I disabled gravity for the majority of the screenshots,
+			so the only force on the cloth is the wind. In one screenshot I enabled gravity and let the cloth fall on the sphere. We can easily see the differences
+			in this compared to the original simulation, as the cloth doesn't land on the center of the sphere and instead gets blown to the side.
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="ec_images/cloth_default.png" width="600px"/>
+						<figcaption>Extra credit cloth baseline, no gravity</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="ec_images/cloth_wind1.png" width="600px"/>
+						<figcaption>Extra credit cloth wind part 1, no gravity</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="ec_images/cloth_wind2.png" width="600px"/>
+						<figcaption>Extra credit cloth wind part 2, no gravity</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="ec_images/cloth_wind3.png" width="600px"/>
+						<figcaption>Extra credit cloth wind part 3, no gravity</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="ec_images/sphere_default.png" width="600px"/>
+						<figcaption>Extra credit sphere scene baseline, no gravity</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="ec_images/sphere_wind1.png" width="600px"/>
+						<figcaption>Extra credit sphere scene with wind, no gravity</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="ec_images/sphere_with_gravity.png" width="600px"/>
+						<figcaption>Extra credit sphere scene with gravity enabled (the cloth doesn't land on the center of sphere anymore)</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
 		
 
 		</div>
