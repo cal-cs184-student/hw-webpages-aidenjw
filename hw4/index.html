@@ -408,6 +408,47 @@
 			more the surface faces the light, the brighter that surface will be. The specular term models the shinyness of the surface. This is done through a halfway vector between
 			the light direction and the view direction. The more the surface normal aligns with this halfway vector, the shinier the surface appears. 
 		</p>
+		<h3>Extra Credit Images</h3>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_top.png" width="600px"/>
+						<figcaption>Extra credit: cloth viewed from above</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_side.png" width="600px"/>
+						<figcaption>Extra credit: cloth viewed from the side</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_angled.png" width="600px"/>
+						<figcaption>Extra credit: cloth viewed from an angle</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_sphere_top.png" width="600px"/>
+						<figcaption>Extra credit: cloth and sphere viewed from above</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_sphere_side.png" width="600px"/>
+						<figcaption>Extra credit: cloth and sphere viewed from the side</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="part5_images/ec_images/cloth_sphere_angled.png" width="600px"/>
+						<figcaption>Extra credit: cloth and sphere viewed from an angle</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			For the extra credit shader, I implemented a Fresnel style effect. I did this by measuring the angle between the surface normal
+			and the camera direction. The dot product  of the normal and viewing direction changes depending if the surface is facing towards
+			 the camera or to the side, which is used to find the fresnel value. I then passed this value into a sine based function to generate
+			 RGB colors depending on the angle. This is what gives the rainbow like effect. 
+		</p>
 		<h3>Texture Mapping Shader</h3>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
