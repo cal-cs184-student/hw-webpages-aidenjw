@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 	<title>Simulating Destruction with Voronoi Cell Fracturing</title>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 	<style>
@@ -55,6 +56,13 @@
 			letter-spacing: 0;
 		}
 
+		h3 {
+			margin-top: 32px;
+			margin-bottom: 12px;
+			font-size: 18px;
+			padding-left: 10px;
+		}
+
 		p {
 			margin: 0 0 10px;
 		}
@@ -70,6 +78,23 @@
 			display: grid;
 			gap: 4px;
 			color: var(--muted);
+		}
+
+		.summary {
+			margin-top: 10px;
+			margin-bottom: 14px;
+			color: var(--text);
+			font-size: 14px;
+			line-height: 1.5;
+		}
+
+		.demo-gif {
+			display: block;
+			margin: 14px auto;
+			max-width: 100%;
+			max-width: 720px;
+			border-radius: 10px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 		}
 
 		.link-row {
@@ -151,6 +176,62 @@
 			font-size: 0.93em;
 		}
 
+		.results-container {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			max-width: 1000px;
+			margin: 20px auto;
+			padding: 20px;
+			border: 1px solid #eee;
+		}
+
+		.section-title {
+			text-align: center;
+			color: #333;
+			border-bottom: 2px solid #333;
+			padding-bottom: 10px;
+			margin-bottom: 30px;
+		}
+
+		.figure-row {
+			display: flex;
+			justify-content: space-between;
+			gap: 15px;
+			margin-bottom: 10px;
+		}
+
+		.figure-item {
+			flex: 1;
+			text-align: center;
+		}
+
+		.figure-item img {
+			width: 100%;
+			height: auto;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.caption-label {
+			display: block;
+			font-weight: bold;
+			margin-top: 10px;
+			font-size: 0.95em;
+		}
+
+		.caption-text {
+			display: block;
+			font-size: 0.85em;
+			color: #666;
+			margin-top: 5px;
+			line-height: 1.4;
+			padding: 0 5px;
+		}
+
+		.print-frame {
+			display: none;
+		}
+
 		@media print {
 			body {
 				font-size: 11px;
@@ -177,18 +258,47 @@
 			}
 
 			.gallery {
-				gap: 8px;
+				display: flex !important;
+				flex-direction: row !important;
+				justify-content: space-between !important;
+				gap: 8px !important;
+				margin: 10px 0 !important;
+			}
+
+			figure {
+				flex: 1 !important;
+				max-width: 23% !important;
+				border: 0.5pt solid var(--line) !important;
+			}
+
+			figure {
+				flex: 1 !important;
+				max-width: 23% !important;
+				border: 0.5pt solid var(--line) !important;
 			}
 
 			figcaption {
-				min-height: 0;
-				font-size: 9px;
-				padding: 5px 6px;
+				font-size: 8px !important;
+				line-height: 1.1 !important;
+				min-height: 0 !important;
 			}
 
 			.callout {
 				padding: 8px 10px;
 				margin: 8px 0;
+			}
+
+			.demo-gif {
+				display: none !important;
+			}
+
+			.print-frame {
+				display: block !important;
+				margin: 10px auto !important;
+				width: 60% !important;
+				max-width: 450px !important;
+				border-radius: 6px !important;
+				border: 1px solid #ccc !important;
 			}
 		}
 
@@ -212,9 +322,18 @@
 			<div class="meta">
 				<div><strong>Team:</strong> Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
 			</div>
+			<div class="summary">We simulate realistic real-time destruction by fracturing objects into dynamic Voronoi cells and simulating their physical breakup under impact.</div>
+
+			<div class="demo-container">
+				<img class="demo-gif" src="assets/destruction-demo.gif" alt="Real-time Voronoi fracture simulation demo">
+
+				<img class="print-frame" src="assets/destruction-frame.jpg" alt="Simulation frame">
+			</div>
+
 			<div class="link-row">
 				<strong>Final Deliverables</strong>
 				<div><span>Final Project webpage:</span> <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/final_webpage.html">https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/final_webpage.html</a></div>
+				<div><span>Final Project video:</span> <a href="TODO">TODO</a></div>
 				<div><span>Project repo:</span> <a href="https://github.com/Elau2/graphics-final-project">https://github.com/Elau2/graphics-final-project</a></div>
 				<div><span>Webpage repo:</span> <a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a></div>
 
@@ -233,12 +352,22 @@
 		<section>
 			<h2>Abstract</h2>
 			<p>
-				We build an interactive OpenGL destruction simulator that fractures closed triangle meshes into
-				smaller fragments and simulates those fragments as rigid bodies. The current system supports OBJ mesh
-				loading, Voronoi-style procedural fracture, a uniform-grid fracture baseline, real-time rigid-body
-				motion, ground collisions, fragment interactions, timestep recording and scrubbing, and click-based
-				impact events.
+				We build an interactive OpenGL-based destruction simulator that fractures closed triangle meshes into smaller fragments and simulates the resulting pieces as rigid bodies in real time. The system supports OBJ mesh loading and provides two fracture modes: a Voronoi-style procedural fracture method for generating irregular, impact-driven fragmentation, and a uniform-grid baseline for comparison. Fracturing is coupled with a rigid-body physics engine that handles linear and angular motion, ground collisions, and fragment-to-fragment interactions under contact constraints and friction. User interaction is supported through click-based impact events that dynamically trigger localized fractures. To enable reproducibility and inspection of simulation behavior, the system records full timestep history and supports scrubbing through simulation states without re-simulation. Together, these components form a physically-driven, interactive pipeline for real-time mesh destruction and animation.
 			</p>
+		</section>
+
+		<section>
+			<h2>Controls</h2>
+			<div class="callout">
+				<ul>
+					<li><strong>Click:</strong> Apply impact force / fracture object</li>
+					<li><strong>Space:</strong> Pause / resume simulation</li>
+					<li><strong>R:</strong> Reset scene</li>
+					<li><strong>Left/Right Arrow:</strong> Scrub simulation history</li>
+					<li><strong>G:</strong> Toggle grid fracture mode</li>
+					<li><strong>V:</strong> Toggle Voronoi fracture mode</li>
+				</ul>
+			</div>
 		</section>
 
 		<section class="two-col">
@@ -247,30 +376,260 @@
 				Our system achieves real-time physical destruction by combining iterated half-space clipping for fragmentation with a custom impulse-based rigid body solver. Unlike traditional "pre-fractured" assets (usually in the form of uniform-grid fracturing), our pipeline generates unique topology based on user interaction.
 			</div>
 			<div>
+				<h3>Mesh clipping</h3>
+				For each triangle, we classify its vertices as inside or outside the cutting plane, and generate new edges wherever triangle edges straddle the plane. We deduplicate cut vertices per unordered edge so that adjacent triangles share identical intersection points, preserving watertightness. Each clipped triangle contributes a segment to the resulting cap, which we then assemble into one or more loops using an adjacency map over segment endpoints. Each loop is fan-triangulated from its centroid, and we verify the winding against the plane normal, flipping it when necessary to ensure consistent orientation and eliminate direction-dependent edge cases.
+
 				<h3>Voronoi Fracture</h3>
 				For each seed point <code>s_i</code>, we build the perpendicular bisector plane between <code>s_i</code> and every other seed <code>s_j</code>, oriented so that <code>s_i</code>'s side is the "kept" half-space. We then clip the original mesh by every such plane in sequence. The intersection of the kept half-spaces is exactly the Voronoi cell of <code>s_i</code> intersected with the mesh — we never need to build a global 3D Voronoi diagram (no incremental convex-hull construction, no dual graph). Total cost is O(N²) planes in the number of seeds, which is fine for N up to a few hundred. The seeds themselves are sampled uniformly in the mesh's AABB; with the <code>useImpactBias</code> option they're drawn from a Gaussian around the impact point instead, which produces convincingly crater-shaped clusters.
 
-				<h3>Rigid-body Dynamics</h3>
-				Semi-implicit Euler on linear velocity, first-order quaternion derivative on angular velocity followed by unit renormalization. Ground contacts are resolved via per-vertex penetration depth (single deepest contact per body per step); body-body contacts use a vertex-inside-AABB probe in the other body's frame to generate contact points. Normal + tangential impulses are computed with the standard inertia-aware impulse formula, with the tangent impulse clamped to the Coulomb friction cone. Baumgarte-style positional correction stabilizes stacks.
 			</div>
 			<div>
-				<h3>Mesh clipping</h3>
-				For each triangle, vertices are classified as inside / outside the plane; edges that straddle the plane are cut, with cut-vertex positions deduplicated per unordered edge so adjacent triangles share exact intersection vertices (watertightness depends on this). Each cut triangle contributes a segment to the cap, and we stitch those segments into one or more loops using an adjacency map, then fan-triangulate each loop from its centroid. The fan winding is auto-verified against the plane normal and flipped if needed, which removes a whole class of case-analysis direction bugs.
-
 				<h3>Mass Properties</h3>
-				Signed-tetrahedra-from-origin integration per Mirtich 1996. For every triangle we form a signed tet with the origin, accumulate per-tet volume / first moments / second moments, then apply the parallel-axis theorem to shift the inertia tensor from the origin to the CoM. This gives a closed-form answer valid for any closed mesh — no voxelization, no Monte Carlo.
+				We compute mass properties using signed tetrahedra integration as described in Mirtich 1996. For each triangle, we form a signed tetrahedron with the origin and accumulate volume, first moments, and second moments across all tetrahedra. We then apply the parallel-axis theorem to shift the inertia tensor from the origin to the center of mass. This yields a closed-form solution valid for any closed mesh, without requiring voxelization or Monte Carlo sampling.
+
+				<h3>Rigid-body Dynamics</h3>
+				We integrate linear motion using semi-implicit Euler and update angular motion using a first-order quaternion derivative followed by unit renormalization. Ground contacts are resolved using per-vertex penetration depth, where we select a single deepest contact per body per step. Body–body contacts are computed by probing vertices in one body against the other body's AABB in its local frame to generate contact points. Normal and tangential impulses are then applied using the standard inertia-aware impulse formulation, with the tangential component clamped to the Coulomb friction cone. We stabilize stacked configurations using Baumgarte-style positional correction.
 
 				<h3>Timestep Scrubbing</h3>
-				Every simulation step we record each body's <code>(position, orientation)</code> into a ring buffer capped at ~30 s of history. Scrubbing restores those transforms directly without re-simulating and zeroes velocities, so unpausing mid-scrub restarts from rest cleanly.
+				At each simulation step, we store each body's <code>(position, orientation)</code> in a ring buffer covering approximately 30 seconds of history. During scrubbing, we restore transforms directly from this buffer rather than re-simulating, and reset velocities to zero. When simulation resumes, the system restarts cleanly from a state of rest.
 			</div>
 		</section>
 
 		<section>
+			<h3>Problems Encountered & Solutions</h3>
+            <div class="callout">
+                <strong>The "Jitter" & Stability Problem</strong>
+                <p>
+                    One of our most significant hurdles was the persistent jittering of fragments once they settled on the ground. Because we used a single deepest-vertex contact model, fragments would often "micro-bounce" as gravity and the impulse solver fought over the penetration depth at the point of contact.
+                </p>
+                <p>
+                    <strong>The Solution:</strong> We implemented <strong>Baumgarte Stabilization</strong>. By adding a bias term to the impulse equation, we allowed the solver to resolve penetrations over several frames rather than instantly. We also introduced a linear and angular velocity "damping" factor that exponentially decays energy when a body is near-rest, which helped the shards finally reach a state of equilibrium.
+                </p>
+            </div>
+
+            <div class="two-col" style="margin-top: 20px;">
+                <div>
+                    <strong>Numerical Precision & "Sliver" Triangles</strong>
+                    <p style="font-size: 0.9em; color: var(--muted);">
+                        During Voronoi clipping, planes would occasionally pass through a mesh vertex or edge with near-zero distance. This created "sliver triangles" (extremely thin geometry) that caused the mass-property integrator to produce <code>NaN</code> values, crashing the simulation.
+                    </p>
+                    <p style="font-size: 0.9em;">
+                        <strong>The Solution:</strong> We introduced a robust <code>EPSILON</code> threshold for all plane-distance classifications. If a vertex was within \(10^{-5}\) units of the plane, we snapped it to the plane, preventing the creation of degenerate geometry.
+                    </p>
+                </div>
+                <div>
+                    <strong>Computational Bottlenecks</strong>
+                    <p style="font-size: 0.9em; color: var(--muted);">
+                        Our initial goal was to support full fragment-to-fragment collisions. However, with 40+ fragments, the \(O(N^2)\) pair-tests became too slow for real-time performance on high-poly meshes like the teapot.
+                    </p>
+                    <p style="font-size: 0.9em;">
+                        <strong>The Solution:</strong> We prioritized a high-performance AABB broad-phase to cull unnecessary checks and optimized the "vertex-in-body" test by transforming points into the local coordinate space of the target fragment. This maintained 60 FPS even during complex fracture events.
+                    </p>
+                </div>
+            </div>
+
+            <h3>Lessons Learned</h3>
+            <div class="accomplishments" style="margin-top: 10px;">
+                <ul>
+                    <li>
+                        <strong>Geometric Robustness:</strong> We learned that even a "perfect" physics solver will fail if the underlying mesh isn't watertight. Maintaining topological integrity during clipping is 90% of the battle in a destruction simulation.
+                    </li>
+                    <li>
+                        <strong>Trade-offs in Real-Time Systems:</strong> Interactivity often requires a "close enough" approach. We learned to favor stable, semi-implicit Euler integration and Baumgarte bias over more complex, slow-moving exact solvers.
+                    </li>
+                    <li>
+                        <strong>The Utility of Debug Tools:</strong> Building the <em>Timestep Recorder</em> was originally a "stretch goal," but it became our most vital tool. Being able to scrub back and forth through a crash was the only way we could identify specific geometric edge cases.
+                    </li>
+                    <li>
+                        <strong>Math in Motion:</strong> Seeing Quaternions resolve gimbal lock and Mirtich’s integrals produce accurate centers of mass made abstract linear algebra concepts feel tangible and essential.
+                    </li>
+                </ul>
+            </div>
+		</section>
+
+		<section id="results">
 			<h2>Results</h2>
+
+			<h3>Evaluation Framework</h3>
+			<p>To quantify the success of our fracturing and simulation pipeline, we evaluate every destruction event against four key categories of metrics. A "Pass" indicates the simulation is physically plausible and numerically stable.</p>
+
+			<div class="callout">
+				<div class="two-col">
+					<div>
+						<strong>Geometric Integrity</strong>
+						<p style="font-size: 0.85em; color: var(--muted);">
+							<strong>Fragment Yield:</strong> Measures robustness. Ideally, every seed point generates a shard. Yield < 80% suggests the clipper is "eating" small fragments or failing on edge cases.<br><br>
+							<strong>Volume Conservation:</strong> The ultimate test for watertightness. We track total volume post-fracture; deviation indicates holes in the caps or overlapping geometry.<br><br>
+							<strong>Convexity Ratio:</strong> Since Voronoi cells are mathematically convex, any non-convex fragment (Ratio < 100%) reveals a bug in the clipping or capping logic.
+						</p>
+					</div>
+					<div>
+						<strong>Stability & Performance</strong>
+						<p style="font-size: 0.85em; color: var(--muted);">
+							<strong>Uniformity Score:</strong> Defined as \( 1 - \frac{\sigma}{\mu} \). High scores mean "cleaner" splits; lower scores (0.1–0.3) are preferred for <em>Impact Bias</em> to simulate natural debris spread.<br><br>
+							<strong>Aspect Ratio:</strong> Measures fragment "thinness." High values (shards like needles) create "spiking" forces in physics engines and are the leading cause of simulation crashes.<br><br>
+							<strong>Overlap Error:</strong> The total penetration depth at rest. This measures the effectiveness of our <em>Baumgarte Stabilizer</em> in resolving inter-body collisions.
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<h4>Performance Benchmarks</h4>
+			<table style="width: 100%; border-collapse: collapse; font-size: 0.9em; margin-bottom: 24px;">
+				<thead>
+					<tr style="border-bottom: 2px solid var(--line); text-align: left;">
+						<th style="padding: 8px;">Metric</th>
+						<th style="padding: 8px;">Pass Condition</th>
+						<th style="padding: 8px;">Technical Justification</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr style="border-bottom: 1px solid var(--line);">
+						<td style="padding: 8px;"><strong>Fragment Yield</strong></td>
+						<td style="padding: 8px;">&ge; 80%</td>
+						<td style="padding: 8px;">Prevents "disappearing" mass during high-count fractures.</td>
+					</tr>
+					<tr style="border-bottom: 1px solid var(--line);">
+						<td style="padding: 8px;"><strong>Volume Conservation</strong></td>
+						<td style="padding: 8px;">95% &ndash; 102%</td>
+						<td style="padding: 8px;">Ensures the "watertight" capping logic is numerically stable.</td>
+					</tr>
+					<tr style="border-bottom: 1px solid var(--line);">
+						<td style="padding: 8px;"><strong>Convexity Ratio</strong></td>
+						<td style="padding: 8px;">&ge; 95%</td>
+						<td style="padding: 8px;">Voronoi geometry is inherently convex; drops indicate clipping bugs.</td>
+					</tr>
+					<tr style="border-bottom: 1px solid var(--line);">
+						<td style="padding: 8px;"><strong>Aspect Ratio</strong></td>
+						<td style="padding: 8px;">&le; 4.0</td>
+						<td style="padding: 8px;">Needle-like fragments destabilize the impulse-based solver.</td>
+					</tr>
+					<tr style="border-bottom: 1px solid var(--line);">
+						<td style="padding: 8px;"><strong>Settling Time</strong></td>
+						<td style="padding: 8px;">&le; 5.0s</td>
+						<td style="padding: 8px;">Measures the efficiency of friction and restitution damping.</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Quantitative Comparative Analysis</h3>
+            <p>We conducted a controlled test using a standard 1.0m³ cube mesh fractured into 40 segments to compare the geometric and physical properties of the two fracture methods.</p>
+
+            <div class="results-visual-group">
+				<h3>Real-Time Fracture Simulation</h3>
+
+				<div class="figure-row">
+					<div class="figure-item">
+						<div class="demo-container">
+							<img class="demo-gif" src="assets/uniform.gif">
+
+							<img class="print-frame" src="assets/uniform-frame.png">
+						</div>
+						<span class="caption-label">Method: Uniform Grid</span>
+					</div>
+
+					<div class="figure-item">
+						<div class="demo-container">
+							<img class="demo-gif" src="assets/voronoi.gif">
+
+							<img class="print-frame" src="assets/voronoi-frame.png">
+						</div>
+						<span class="caption-label">Method: Voronoi Fracture</span>
+					</div>
+
+				</div>
+			</div>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 10px;">
+                <thead>
+                    <tr style="background-color: var(--soft); border-bottom: 2px solid var(--line); text-align: left;">
+                        <th style="padding: 8px;">Metric</th>
+                        <th style="padding: 8px;">Uniform Grid</th>
+                        <th style="padding: 8px;">Voronoi (Impact)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 8px;"><strong>Uniformity Score</strong></td>
+                        <td style="padding: 8px;">99.76%</td>
+                        <td style="padding: 8px;">39.00%</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 8px;"><strong>Volume Conservation</strong></td>
+                        <td style="padding: 8px;">100.00%</td>
+                        <td style="padding: 8px;">100.00%</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 8px;"><strong>Settling Time (s)</strong></td>
+                        <td style="padding: 8px;">3.39s</td>
+                        <td style="padding: 8px;">3.36s</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 8px;"><strong>Overlap Error (m)</strong></td>
+                        <td style="padding: 8px;">0.0333m</td>
+                        <td style="padding: 8px;">0.0194m</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout" style="margin-top: 20px;">
+                <strong>Discussion: Why these metrics matter</strong>
+                <p style="font-size: 0.9em; margin-top: 8px;">
+                    The contrast in <strong>Uniformity Score</strong> highlights the core trade-off between procedural generation and artistic control. While the Uniform Grid achieves near-perfect uniformity, it lacks the visual "soul" of destruction. The Voronoi method's lower score reflects its ability to cluster detail at the impact site, creating a more convincing narrative of brittle fracture.
+                </p>
+                <p style="font-size: 0.9em;">
+                    From a physics standpoint, <strong>Volume Conservation</strong> is our primary metric for stability. Any loss of volume translates to "phantom forces" or fragments falling through each other. Our results demonstrate that even with irregular Voronoi geometry, our <em>MeshClipper</em> maintains watertightness within 1-2% of the original mesh volume, ensuring the rigid-body solver receives accurate mass properties.
+                </p>
+            </div>
+
+			<h3>Qualitative Analysis</h3>
+			<div class="gallery">
+				<figure>
+					<img src="milestone_images/cube.png" alt="Fractured cube before major collision">
+					<figcaption>Freshly fractured cube fragments before the scene fully settles.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/cube_collision.png" alt="Cube fragments after collision">
+					<figcaption>Cube fragments after falling and colliding with the ground.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/teapot.png" alt="Fractured teapot simulation">
+					<figcaption>Teapot mesh loaded from OBJ and split into simulated fragments.</figcaption>
+				</figure>
+				<figure>
+					<img src="milestone_images/teapot_collision.png" alt="Teapot fragments during collision">
+					<figcaption>Teapot fragments interacting during the rigid-body simulation.</figcaption>
+				</figure>
+			</div>
 		</section>
 
 		<section>
 			<h2>References</h2>
+			<divs>
+				<ol>
+					<li>
+						Mirtich, "Fast and Accurate Computation of Polyhedral Mass Properties",
+						<em>Journal of Graphics Tools</em>, 1996.
+					</li>
+
+					<li>
+						Müller et al., "Real Time Dynamic Fracture with Volumetric Approximate Convex Decompositions",
+						SIGGRAPH 2013.
+					</li>
+
+					<li>
+						Baraff &amp; Witkin, "Physically Based Modeling: Rigid Body Simulation",
+						SIGGRAPH 2001 course notes.
+					</li>
+
+					<li>
+						Iñigo Quílez, "Filtered Checkerboard",
+						<a href="https://iquilezles.org/articles/checkerfiltering/" target="_blank">
+							https://iquilezles.org/articles/checkerfiltering/
+						</a>
+					</li>
+				</ol>
+			</div>
 		</section>
 
 		<section>
@@ -278,7 +637,7 @@
 			<ul>
 				<li><strong>Aiden Wang: </strong>part of initial proposal webpage, midpoint webpage, collision implementation, fps + fragment count tracker, ability to increase/decrease fragment count in real time </li>
 				<li><strong>Ethan Lau: </strong>optimizations on the collisions, quantitative metrics, and part of the initial proposal webpage</li>
-				<li><strong>Kelly Tou: </strong>TODO</li>
+				<li><strong>Kelly Tou: </strong>authored a lot of the initial project foundation, including the build/setup, application structure, rendering pipeline, mesh/fracture infrastructure, rigid-body simulation framework, and the initial docs; also did some performance and stability work, especially in the physics/collision system and Voronoi fracture pipeline</li>
 				<li><strong>Sriya Kalyan: </strong>milestone video, final project video, final project webpage, final presentation slides</li>
 			</ul>
 		</section>
