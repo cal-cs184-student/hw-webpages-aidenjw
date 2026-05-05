@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Simulating Destruction with Voronoi Cell Fracturing</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--ink: #17201c;
+			--muted: #52615b;
+			--line: #cfd8d3;
+			--paper: #fbfcfb;
+			--accent: #006a67;
+			--soft: #eef5f1;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+			font-family: "Inter", Arial, sans-serif;
+			font-size: 15px;
+			line-height: 1.55;
+		}
+
+		main {
+			width: min(980px, calc(100% - 32px));
+			margin: 0 auto;
+			padding: 36px 0 48px;
+		}
+
+		header {
+			border-bottom: 2px solid var(--line);
+			padding-bottom: 18px;
+			margin-bottom: 22px;
+		}
+
+		h1 {
+			margin: 0 0 8px;
+			font-size: clamp(30px, 4vw, 46px);
+			line-height: 1.08;
+			letter-spacing: 0;
+		}
+
+		h2 {
+			margin: 24px 0 8px;
+			font-size: 21px;
+			line-height: 1.2;
+			letter-spacing: 0;
+		}
+
+		p {
+			margin: 0 0 10px;
+		}
+
+		a {
+			color: var(--accent);
+			font-weight: 600;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		.meta {
+			display: grid;
+			gap: 4px;
+			color: var(--muted);
+		}
+
+		.link-row {
+			display: grid;
+			gap: 4px;
+			margin-top: 12px;
+		}
+
+		.link-row span {
+			color: var(--muted);
+			font-weight: 600;
+		}
+
+		.callout {
+			background: var(--soft);
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			padding: 14px 16px;
+			margin: 16px 0 6px;
+		}
+
+		ul,
+		ol {
+			margin: 8px 0 0 20px;
+			padding: 0;
+		}
+
+		li {
+			margin: 4px 0;
+		}
+
+		.accomplishments {
+			columns: 2;
+			column-gap: 34px;
+		}
+
+		.accomplishments li {
+			break-inside: avoid;
+		}
+
+		.gallery {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 12px;
+			margin: 14px 0 6px;
+		}
+
+		figure {
+			margin: 0;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			overflow: hidden;
+			background: white;
+		}
+
+		img {
+			display: block;
+			width: 100%;
+			aspect-ratio: 4 / 3;
+			object-fit: cover;
+		}
+
+		figcaption {
+			min-height: 54px;
+			padding: 8px 10px;
+			color: var(--muted);
+			font-size: 12px;
+			line-height: 1.35;
+		}
+
+		.two-col {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 24px;
+		}
+
+		code {
+			font-family: "SFMono-Regular", Consolas, monospace;
+			font-size: 0.93em;
+		}
+
+		@media print {
+			body {
+				font-size: 11px;
+				line-height: 1.35;
+			}
+
+			main {
+				width: 100%;
+				padding: 0;
+			}
+
+			header {
+				margin-bottom: 12px;
+				padding-bottom: 10px;
+			}
+
+			h1 {
+				font-size: 25px;
+			}
+
+			h2 {
+				font-size: 15px;
+				margin: 13px 0 5px;
+			}
+
+			.gallery {
+				gap: 8px;
+			}
+
+			figcaption {
+				min-height: 0;
+				font-size: 9px;
+				padding: 5px 6px;
+			}
+
+			.callout {
+				padding: 8px 10px;
+				margin: 8px 0;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.accomplishments {
+				columns: 1;
+			}
+
+			.gallery,
+			.two-col {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header>
+			<h1>Simulating Destruction with Voronoi Cell Fracturing</h1>
+			<div class="meta">
+				<div><strong>Team:</strong> Sriya Kalyan, Ethan Lau, Kelly Tou, Aiden Wang</div>
+			</div>
+			<div class="link-row">
+				<strong>Final Deliverables</strong>
+				<div><span>Final Project webpage:</span> <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/final_webpage.html">https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/final_webpage.html</a></div>
+				<div><span>Project repo:</span> <a href="https://github.com/Elau2/graphics-final-project">https://github.com/Elau2/graphics-final-project</a></div>
+				<div><span>Webpage repo:</span> <a href="https://github.com/cal-cs184-student/hw-webpages-aidenjw">https://github.com/cal-cs184-student/hw-webpages-aidenjw</a></div>
+
+				</br>
+				<strong>Milestone Links:</strong>
+				<div><span>Milestone webpage:</span> <a href="https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/milestone_webpage.html">https://cal-cs184-student.github.io/hw-webpages-aidenjw/final_project/milestone_webpage.html</a></div>
+				<div><span>Milestone video demo:</span> <a href="https://www.youtube.com/watch?v=BT_0dcrKqs0">https://www.youtube.com/watch?v=BT_0dcrKqs0</a></div>
+				<div><span>Slideshow:</span> <a href="https://docs.google.com/presentation/d/16FgHppQxLHFbdyNn15MWjmMiNXSPDGQdbPoGccdhP4k/edit?slide=id.p#slide=id.p">https://docs.google.com/presentation/d/16FgHppQxLHFbdyNn15MWjmMiNXSPDGQdbPoGccdhP4k/edit?slide=id.p#slide=id.p</a></div>
+
+				<br>
+				<strong>Initial Materials:</strong>
+				<div><span>Original proposal:</span> <a href="index.html">index.html</a></div>
+			</div>
+		</header>
+
+		<section>
+			<h2>Abstract</h2>
+			<p>
+				We build an interactive OpenGL destruction simulator that fractures closed triangle meshes into
+				smaller fragments and simulates those fragments as rigid bodies. The current system supports OBJ mesh
+				loading, Voronoi-style procedural fracture, a uniform-grid fracture baseline, real-time rigid-body
+				motion, ground collisions, fragment interactions, timestep recording and scrubbing, and click-based
+				impact events.
+			</p>
+		</section>
+
+		<section class="two-col">
+			<h2>Technical Approach</h2>
+			<div style="grid-column: 1 / -1;">
+				Our system achieves real-time physical destruction by combining iterated half-space clipping for fragmentation with a custom impulse-based rigid body solver. Unlike traditional "pre-fractured" assets (usually in the form of uniform-grid fracturing), our pipeline generates unique topology based on user interaction.
+			</div>
+			<div>
+				<h3>Voronoi Fracture</h3>
+				For each seed point <code>s_i</code>, we build the perpendicular bisector plane between <code>s_i</code> and every other seed <code>s_j</code>, oriented so that <code>s_i</code>'s side is the "kept" half-space. We then clip the original mesh by every such plane in sequence. The intersection of the kept half-spaces is exactly the Voronoi cell of <code>s_i</code> intersected with the mesh — we never need to build a global 3D Voronoi diagram (no incremental convex-hull construction, no dual graph). Total cost is O(N²) planes in the number of seeds, which is fine for N up to a few hundred. The seeds themselves are sampled uniformly in the mesh's AABB; with the <code>useImpactBias</code> option they're drawn from a Gaussian around the impact point instead, which produces convincingly crater-shaped clusters.
+
+				<h3>Rigid-body Dynamics</h3>
+				Semi-implicit Euler on linear velocity, first-order quaternion derivative on angular velocity followed by unit renormalization. Ground contacts are resolved via per-vertex penetration depth (single deepest contact per body per step); body-body contacts use a vertex-inside-AABB probe in the other body's frame to generate contact points. Normal + tangential impulses are computed with the standard inertia-aware impulse formula, with the tangent impulse clamped to the Coulomb friction cone. Baumgarte-style positional correction stabilizes stacks.
+			</div>
+			<div>
+				<h3>Mesh clipping</h3>
+				For each triangle, vertices are classified as inside / outside the plane; edges that straddle the plane are cut, with cut-vertex positions deduplicated per unordered edge so adjacent triangles share exact intersection vertices (watertightness depends on this). Each cut triangle contributes a segment to the cap, and we stitch those segments into one or more loops using an adjacency map, then fan-triangulate each loop from its centroid. The fan winding is auto-verified against the plane normal and flipped if needed, which removes a whole class of case-analysis direction bugs.
+
+				<h3>Mass Properties</h3>
+				Signed-tetrahedra-from-origin integration per Mirtich 1996. For every triangle we form a signed tet with the origin, accumulate per-tet volume / first moments / second moments, then apply the parallel-axis theorem to shift the inertia tensor from the origin to the CoM. This gives a closed-form answer valid for any closed mesh — no voxelization, no Monte Carlo.
+
+				<h3>Timestep Scrubbing</h3>
+				Every simulation step we record each body's <code>(position, orientation)</code> into a ring buffer capped at ~30 s of history. Scrubbing restores those transforms directly without re-simulating and zeroes velocities, so unpausing mid-scrub restarts from rest cleanly.
+			</div>
+		</section>
+
+		<section>
+			<h2>Results</h2>
+		</section>
+
+		<section>
+			<h2>References</h2>
+		</section>
+
+		<section>
+			<h2>Contributions</h2>
+			<ul>
+				<li><strong>Aiden Wang: </strong>part of initial proposal webpage, midpoint webpage, collision implementation, fps + fragment count tracker, ability to increase/decrease fragment count in real time </li>
+				<li><strong>Ethan Lau: </strong>optimizations on the collisions, quantitative metrics, and part of the initial proposal webpage</li>
+				<li><strong>Kelly Tou: </strong>TODO</li>
+				<li><strong>Sriya Kalyan: </strong>milestone video, final project video, final project webpage, final presentation slides</li>
+			</ul>
+		</section>
+	</main>
+</body>
+
+</html>
